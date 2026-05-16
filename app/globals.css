@@ -21,3 +21,12 @@ body {
 h1, h2, h3 {
   font-family: var(--font-heading), system-ui, sans-serif;
 }
+
+@keyframes carousel-scroll {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [style*="carousel-scroll"] { animation: none !important; }
+}
