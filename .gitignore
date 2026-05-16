@@ -1,0 +1,31 @@
+# Dependências
+/node_modules
+/.pnp
+.pnp.js
+
+# Build do Next.js
+/.next/
+/out/
+/build
+next-env.d.ts
+
+# Testes
+/coverage
+
+# Variáveis de ambiente
+.env
+.env*.local
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Editores / IDE
+/.idea
+.vscode/*
+!.vscode/extensions.json
+.DS_Store
+
+# Companheiro visual do brainstorming (mockups temporários)
+/.superpowers
