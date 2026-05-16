@@ -1,0 +1,11 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm run *)",
+      "Bash(echo \"Started PID $!\")",
+      "Bash(curl *)",
+      "Bash(kill 1903)",
+      "Bash(pkill -f \"next dev\")"
+    ]
+  }
+}
