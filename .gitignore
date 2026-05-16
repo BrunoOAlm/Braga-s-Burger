@@ -29,3 +29,17 @@ yarn-error.log*
 
 # Companheiro visual do brainstorming (mockups temporários)
 /.superpowers
+
+# Configurações locais de sessão (contêm PID e permissões efêmeras)
+.claude/settings.local.json
+
+# Python bytecode
+__pycache__/
+*.pyc
+*.pyo
+
+# TypeScript build info
+*.tsbuildinfo
+
+# Skills do Claude Code (ferramentas locais de design — não são código do produto)
+.claude/skills/

@@ -1,0 +1,32 @@
+@import "tailwindcss";
+
+@theme {
+  --color-brand-orange: #ef6c00;
+  --color-brand-orange-light: #ff8c00;
+  --color-brand-brown: #8b4513;
+  --color-brand-cream: #f5f0e6;
+  --color-brand-dark: #1a1a1a;
+  --color-brand-gold: #ffd700;
+
+  --font-heading: var(--font-poppins);
+  --font-body: var(--font-inter);
+}
+
+body {
+  background-color: var(--color-brand-cream);
+  color: var(--color-brand-dark);
+  font-family: var(--font-body), system-ui, sans-serif;
+}
+
+h1, h2, h3 {
+  font-family: var(--font-heading), system-ui, sans-serif;
+}
+
+@keyframes carousel-scroll {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [style*="carousel-scroll"] { animation: none !important; }
+}

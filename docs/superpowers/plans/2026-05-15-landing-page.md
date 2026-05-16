@@ -4,9 +4,9 @@
 
 **Goal:** Construir a landing page pública da Braga's Burger (sub-projeto 1): hero cinematográfico animado, carrossel de destaques, galeria com lightbox, cardápio com filtro, informações e rodapé.
 
-**Architecture:** App Next.js 14 (App Router) com componentes pequenos de responsabilidade única. Dados do cardápio num arquivo TypeScript fixo, modelado para espelhar a futura API. Lógica pura (formatação, filtro, gate da intro) isolada em `lib/` e coberta por testes. Animações com Framer Motion, sempre respeitando `prefers-reduced-motion`.
+**Architecture:** App Next.js 16 (App Router) com componentes pequenos de responsabilidade única. Dados do cardápio num arquivo TypeScript fixo, modelado para espelhar a futura API. Lógica pura (formatação, filtro, gate da intro) isolada em `lib/` e coberta por testes. Animações com Framer Motion, sempre respeitando `prefers-reduced-motion`.
 
-**Tech Stack:** Next.js 14, TypeScript, Tailwind CSS v4, Framer Motion, Vitest + React Testing Library.
+**Tech Stack:** Next.js 16, TypeScript, Tailwind CSS v4, Framer Motion, Vitest + React Testing Library.
 
 **Spec de referência:** `docs/superpowers/specs/2026-05-15-landing-page-design.md`
 
