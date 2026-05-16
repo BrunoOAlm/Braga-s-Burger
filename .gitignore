@@ -40,3 +40,6 @@ __pycache__/
 
 # TypeScript build info
 *.tsbuildinfo
+
+# Skills do Claude Code (ferramentas locais de design — não são código do produto)
+.claude/skills/

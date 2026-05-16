@@ -12,7 +12,11 @@ export function HeroSection() {
   const [introRunning, setIntroRunning] = useState(false);
 
   useEffect(() => {
+    // hasSeenIntro() lê sessionStorage — não disponível no servidor.
+    // O setState é intencional: sincroniza o estado inicial com a realidade
+    // do cliente após a hidratação (padrão de "portão de intro" único por sessão).
     if (!hasSeenIntro() && !reduceMotion) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setIntroRunning(true);
     }
   }, [reduceMotion]);

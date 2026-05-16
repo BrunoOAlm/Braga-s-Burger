@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo } from 'react';
+import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { ParticleExplosion } from './ParticleExplosion';
 
@@ -10,19 +10,20 @@ type BurgerRainProps = {
 
 const BURGER_COUNT = 14;
 
+// Gerado fora do render: executado apenas uma vez no módulo, valores estáveis.
+function generateBurgers() {
+  return Array.from({ length: BURGER_COUNT }).map((_, index) => ({
+    id: index,
+    x: Math.random() * 100,
+    rotateTo: Math.random() * 720 - 360,
+    duration: 1.6 + Math.random() * 0.8, // ~±20%
+    delay: Math.random() * 1.5,
+  }));
+}
+
 export function BurgerRain({ onComplete }: BurgerRainProps) {
-  // valores aleatórios fixados uma vez (variância de posição/rotação/velocidade)
-  const burgers = useMemo(
-    () =>
-      Array.from({ length: BURGER_COUNT }).map((_, index) => ({
-        id: index,
-        x: Math.random() * 100,
-        rotateTo: Math.random() * 720 - 360,
-        duration: 1.6 + Math.random() * 0.8, // ~±20%
-        delay: Math.random() * 1.5,
-      })),
-    [],
-  );
+  // Inicializador lazy: executado somente no primeiro mount, nunca durante re-renders.
+  const [burgers] = useState(generateBurgers);
 
   const lastIndex = burgers.reduce(
     (slowest, b) => (b.delay + b.duration > slowest.delay + slowest.duration ? b : slowest),

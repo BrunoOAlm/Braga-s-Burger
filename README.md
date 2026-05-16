@@ -1,36 +1,51 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Braga's Burger — Landing Page
 
-## Getting Started
+Landing page da **Braga's Burger**, uma hamburgueria artesanal da Zona Norte.
+Este é o **sub-projeto 1** de uma plataforma maior que incluirá cardápio online, pedidos e painel administrativo.
 
-First, run the development server:
+## Stack
+
+| Tecnologia | Versão |
+|---|---|
+| Next.js | 16 |
+| React | 19 |
+| TypeScript | 5 |
+| Tailwind CSS | v4 |
+| Framer Motion | — |
+
+## Comandos
 
 ```bash
+# Servidor de desenvolvimento (http://localhost:3000)
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+
+# Testes automatizados (Jest + React Testing Library)
+npm test
+
+# Build de produção
+npm run build
+
+# Lint (ESLint com regras React 19)
+npm run lint
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Estrutura de pastas
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```
+app/              → Rotas e layout raiz do Next.js (App Router)
+components/
+  ui/             → Componentes genéricos reutilizáveis (Button, etc.)
+  layout/         → Header, Footer e estrutura de página
+  hero/           → Seção hero: animação de intro (BurgerRain, ParticleExplosion, HeroSection)
+  sections/       → Demais seções da landing (cardápio, sobre, contato…)
+lib/              → Utilitários e helpers (ex.: controle de intro por sessão)
+data/             → Dados estáticos do cardápio e conteúdo da página
+public/           → Assets estáticos (imagens)
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Observações para quem está aprendendo
 
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- O projeto usa **App Router** do Next.js — as páginas ficam em `app/`, não em `pages/`.
+- Componentes marcados com `'use client'` rodam no navegador; os demais são **Server Components** por padrão.
+- A animação de intro (`BurgerRain`) só aparece **uma vez por sessão** (controlado via `sessionStorage` em `lib/intro.ts`).
+- Os testes ficam junto aos componentes, no padrão `*.test.tsx`.
