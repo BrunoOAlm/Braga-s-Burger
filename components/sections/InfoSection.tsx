@@ -25,12 +25,16 @@ export function InfoSection() {
           <h3 className="font-heading text-xl font-bold text-brand-gold">Contato</h3>
           <a
             href="https://wa.me/5511999999999"
+            target="_blank"
+            rel="noopener noreferrer"
             className="mt-3 block text-sm text-white/70 transition-colors hover:text-brand-gold"
           >
             WhatsApp: (11) 99999-9999
           </a>
           <a
             href="https://instagram.com/bragas_burger"
+            target="_blank"
+            rel="noopener noreferrer"
             className="mt-1 block text-sm text-white/70 transition-colors hover:text-brand-gold"
           >
             Instagram: @bragas_burger
