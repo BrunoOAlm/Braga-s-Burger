@@ -9,12 +9,12 @@ export function FeaturedCarousel() {
   const [paused, setPaused] = useState(false);
 
   return (
-    <section id="destaques" className="bg-brand-dark px-6 py-20">
+    <section id="destaques" className="bg-ink px-6 py-20">
       <div className="mx-auto max-w-6xl">
-        <h2 className="text-center font-heading text-3xl font-extrabold text-white md:text-4xl">
+        <h2 className="text-center font-heading text-3xl font-extrabold text-paper md:text-4xl">
           Destaques da casa
         </h2>
-        <p className="mt-2 text-center text-white/60">
+        <p className="mt-2 text-center text-muted">
           Os campeões de pedido — passe o mouse para pausar.
         </p>
 
