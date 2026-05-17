@@ -249,10 +249,12 @@ de acessibilidade — ver §11).
 
 - Fundo `ink`, logo ~56px, identidade monocromática.
 - Links-âncora (Cardápio, Galeria, Contato) + redes sociais.
-- **Links de Políticas e Termos** (pendência conhecida): adicionar links de "Política de
-  Privacidade" e "Termos de Uso". Como ainda não há páginas de conteúdo, apontam para rotas
-  placeholder (`/politica-de-privacidade`, `/termos`) a serem preenchidas depois, **ou** o cliente
-  decide ocultá-los até existir conteúdo — confirmar na revisão do spec.
+- **Links de Políticas e Termos** (pendência conhecida): o rodapé linka "Política de Privacidade"
+  (`/politica-de-privacidade`) e "Termos de Uso" (`/termos`). Decisão do cliente: criar as duas
+  páginas com **texto provisório genérico**, cada uma com um **aviso visível** de que o conteúdo é
+  provisório, sem validade jurídica, e será substituído por versão redigida por advogado no
+  Sub-projeto 2 (Checkout) — quando o site passar a coletar dados pessoais. As páginas reaproveitam
+  o tema monocromático e a Navbar/Footer.
 
 ---
 
@@ -291,6 +293,8 @@ Mantém os critérios do spec original e **fecha as pendências conhecidas**:
 - `components/sections/ProductList.tsx` — lista compacta (molhos/bebidas).
 - `components/sections/DeliveryLookup.tsx` — consulta de taxa por bairro.
 - `data/delivery.ts` — 39 bairros + taxas.
+- `app/termos/page.tsx` — página de Termos de Uso (texto provisório + aviso).
+- `app/politica-de-privacidade/page.tsx` — página de Política de Privacidade (texto provisório + aviso).
 - `public/images/products/*.webp` — 39 fotos baixadas.
 - `public/images/logo.png` — logo processada (transparente).
 
