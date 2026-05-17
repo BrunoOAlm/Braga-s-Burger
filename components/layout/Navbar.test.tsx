@@ -4,9 +4,9 @@ import userEvent from '@testing-library/user-event';
 import { Navbar } from './Navbar';
 
 describe('Navbar', () => {
-  it('exibe a marca e os links de navegação', () => {
+  it('exibe a logo e os links de navegação', () => {
     render(<Navbar />);
-    expect(screen.getByText("Braga's Burger")).toBeInTheDocument();
+    expect(screen.getByAltText("Braga's Burger")).toBeInTheDocument();
     expect(screen.getByRole('link', { name: 'Cardápio' })).toHaveAttribute('href', '#cardapio');
   });
 

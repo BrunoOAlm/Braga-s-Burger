@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { Button } from '@/components/ui/Button';
+import { Logo } from '@/components/ui/Logo';
 
 const links = [
   { label: 'Cardápio', href: '#cardapio' },
@@ -16,10 +17,10 @@ export function Navbar() {
 
   return (
     <nav className="fixed inset-x-4 top-4 z-50 mx-auto max-w-6xl">
-      <div className="flex items-center justify-between rounded-full bg-brand-dark/90 px-6 py-3 backdrop-blur">
-        <span className="font-heading text-lg font-extrabold text-brand-gold">
-          Braga&apos;s Burger
-        </span>
+      <div className="flex items-center justify-between rounded-full border border-line bg-ink/85 px-6 py-3 backdrop-blur">
+        <a href="#" aria-label="Braga's Burger — início" className="flex items-center">
+          <Logo size={40} priority />
+        </a>
 
         {/* Links — desktop */}
         <ul className="hidden gap-6 md:flex">
@@ -27,7 +28,7 @@ export function Navbar() {
             <li key={link.href}>
               <a
                 href={link.href}
-                className="text-sm font-medium text-white/80 transition-colors hover:text-brand-gold"
+                className="text-sm font-medium text-muted transition-colors hover:text-paper"
               >
                 {link.label}
               </a>
@@ -46,7 +47,7 @@ export function Navbar() {
           aria-label={open ? 'Fechar menu' : 'Abrir menu'}
           aria-expanded={open}
           onClick={() => setOpen((v) => !v)}
-          className="cursor-pointer text-white md:hidden"
+          className="cursor-pointer text-paper md:hidden"
         >
           <svg
             width="24"
@@ -76,14 +77,14 @@ export function Navbar() {
 
       {/* Menu — mobile */}
       {open && (
-        <div className="mt-2 rounded-2xl bg-brand-dark/95 p-4 backdrop-blur md:hidden">
+        <div className="mt-2 rounded-2xl border border-line bg-ink/95 p-4 backdrop-blur md:hidden">
           <ul className="flex flex-col gap-1">
             {links.map((link) => (
               <li key={link.href}>
                 <a
                   href={link.href}
                   onClick={close}
-                  className="block rounded-lg px-3 py-2 text-sm font-medium text-white/80 transition-colors hover:bg-white/10 hover:text-brand-gold"
+                  className="block rounded-lg px-3 py-2 text-sm font-medium text-muted transition-colors hover:bg-surface hover:text-paper"
                 >
                   {link.label}
                 </a>
@@ -93,7 +94,7 @@ export function Navbar() {
           <a
             href="#cardapio"
             onClick={close}
-            className="mt-3 block rounded-full bg-brand-orange px-6 py-3 text-center text-sm font-semibold text-white transition-colors hover:bg-brand-orange-light"
+            className="mt-3 block rounded-full bg-white px-6 py-3 text-center text-sm font-semibold text-ink transition-colors hover:bg-paper"
           >
             Peça agora
           </a>
