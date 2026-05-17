@@ -3,27 +3,39 @@ import { render, screen } from '@testing-library/react';
 import { ProductCard } from './ProductCard';
 import type { Product } from '@/lib/types';
 
-const product: Product = {
-  id: 'x-bacon',
-  categoryId: 'classicos',
-  name: 'X-Bacon',
-  description: 'Bacon crocante e queijo.',
-  price: 27.9,
-  imageUrl: '/images/x-bacon.jpg',
-  featured: false,
+const base: Product = {
+  id: 'p1',
+  categoryId: 'burgers',
+  name: 'Duplo',
+  description: 'Dois blends.',
+  price: 39.9,
+  priceFrom: true,
+  imageUrl: '/images/products/duplo.webp',
+  featured: true,
   available: true,
 };
 
 describe('ProductCard', () => {
-  it('exibe nome, descrição e preço formatado', () => {
-    render(<ProductCard product={product} />);
-    expect(screen.getByText('X-Bacon')).toBeInTheDocument();
-    expect(screen.getByText('Bacon crocante e queijo.')).toBeInTheDocument();
-    expect(screen.getByText('R$ 27,90')).toBeInTheDocument();
+  it('mostra nome, descrição e preço com "A partir de"', () => {
+    render(<ProductCard product={base} />);
+    expect(screen.getByText('Duplo')).toBeInTheDocument();
+    expect(screen.getByText('Dois blends.')).toBeInTheDocument();
+    expect(screen.getByText('A partir de R$ 39,90')).toBeInTheDocument();
   });
 
-  it('exibe "Esgotado" quando o produto está indisponível', () => {
-    render(<ProductCard product={{ ...product, available: false }} />);
+  it('mostra a foto quando há imageUrl', () => {
+    render(<ProductCard product={base} />);
+    expect(screen.getByAltText('Duplo')).toBeInTheDocument();
+  });
+
+  it('mostra placeholder quando imageUrl é null', () => {
+    render(<ProductCard product={{ ...base, imageUrl: null }} />);
+    expect(screen.queryByAltText('Duplo')).not.toBeInTheDocument();
+    expect(screen.getByTestId('product-placeholder')).toBeInTheDocument();
+  });
+
+  it('mostra "Esgotado" quando indisponível', () => {
+    render(<ProductCard product={{ ...base, available: false }} />);
     expect(screen.getByText('Esgotado')).toBeInTheDocument();
   });
 });
