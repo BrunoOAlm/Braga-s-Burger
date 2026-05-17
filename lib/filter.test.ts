@@ -6,6 +6,7 @@ const base: Omit<Product, 'id' | 'categoryId'> = {
   name: 'X',
   description: 'desc',
   price: 10,
+  priceFrom: false,
   imageUrl: '/x.jpg',
   featured: false,
   available: true,

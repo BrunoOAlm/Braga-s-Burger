@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { formatPrice } from './format';
+import { formatPrice, formatProductPrice } from './format';
 
 describe('formatPrice', () => {
   it('formata um valor com centavos', () => {
@@ -12,5 +12,15 @@ describe('formatPrice', () => {
 
   it('formata zero', () => {
     expect(formatPrice(0)).toBe('R$ 0,00');
+  });
+});
+
+describe('formatProductPrice', () => {
+  it('prefixa "A partir de" quando priceFrom é true', () => {
+    expect(formatProductPrice({ price: 22.9, priceFrom: true })).toBe('A partir de R$ 22,90');
+  });
+
+  it('mostra só o preço quando priceFrom é false', () => {
+    expect(formatProductPrice({ price: 3.9, priceFrom: false })).toBe('R$ 3,90');
   });
 });
