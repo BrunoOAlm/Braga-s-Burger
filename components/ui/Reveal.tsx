@@ -19,7 +19,10 @@ export function Reveal({ children, delay = 0 }: RevealProps) {
     <motion.div
       initial={{ opacity: 0, y: 30 }}
       whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, amount: 0.2 }}
+      // amount: 'some' (qualquer parte visível) — NÃO um número como 0.2:
+      // seções muito altas (o cardápio passa de 10.000px) nunca atingiriam
+      // 20% visíveis na viewport e ficariam presas em opacity 0 (invisíveis).
+      viewport={{ once: true, amount: 'some' }}
       transition={
         reduceMotion
           ? { duration: 0 }
