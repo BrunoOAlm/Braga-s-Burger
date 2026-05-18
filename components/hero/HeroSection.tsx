@@ -23,6 +23,7 @@ export function HeroSection() {
           muted
           loop
           playsInline
+          poster="/videos/hero-poster.jpg"
           aria-hidden="true"
         >
           <source src="/videos/hero-bg.mp4" type="video/mp4" />
