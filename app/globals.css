@@ -23,6 +23,13 @@ h1, h2, h3 {
   font-family: var(--font-heading), system-ui, sans-serif;
 }
 
+/* Foco visível por teclado em todos os elementos interativos. O offset
+   garante contraste mesmo sobre botões claros (bg-white / bg-paper). */
+:focus-visible {
+  outline: 2px solid var(--color-paper);
+  outline-offset: 2px;
+}
+
 @keyframes carousel-scroll {
   from { transform: translateX(0); }
   to { transform: translateX(-50%); }
