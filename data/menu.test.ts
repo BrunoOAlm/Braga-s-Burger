@@ -3,9 +3,9 @@ import { categories, products } from './menu';
 import { deliveryAreas } from './delivery';
 
 describe('dados do cardápio', () => {
-  it('tem 7 categorias e 80 produtos', () => {
+  it('tem 7 categorias e 83 produtos', () => {
     expect(categories).toHaveLength(7);
-    expect(products).toHaveLength(80);
+    expect(products).toHaveLength(83);
   });
 
   it('todo produto pertence a uma categoria existente', () => {
