@@ -4,12 +4,12 @@ import { useEffect, useRef, useState } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 
 const photos = [
-  '/images/products/duplo.webp',
-  '/images/products/majestoso.webp',
-  '/images/products/crispy-catupiry.webp',
-  '/images/products/explosao-cheddar.webp',
-  '/images/products/epico.webp',
-  '/images/products/triplo-smash.webp',
+  '/gallery/gallery-1.webp',
+  '/gallery/gallery-2.webp',
+  '/gallery/gallery-3.webp',
+  '/gallery/gallery-4.webp',
+  '/gallery/gallery-5.webp',
+  '/gallery/rodizio.webp',
 ];
 
 export function Gallery() {
