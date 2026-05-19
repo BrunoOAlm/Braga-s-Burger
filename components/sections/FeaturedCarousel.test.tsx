@@ -3,11 +3,25 @@ import { render, screen } from '@testing-library/react';
 import { FeaturedCarousel } from './FeaturedCarousel';
 
 describe('FeaturedCarousel', () => {
-  it('exibe apenas produtos marcados como destaque', () => {
+  it('exibe os produtos marcados como destaque', () => {
     render(<FeaturedCarousel />);
-    // "Duplo" é featured: true (o carrossel duplica os itens para o loop)
-    expect(screen.getAllByText('Duplo').length).toBeGreaterThan(0);
-    // "Braguinha" é featured: false → não aparece
+    // O loop do Embla reposiciona os slides por transform — não há nós duplicados no DOM.
+    expect(screen.getByText('Duplo')).toBeInTheDocument();
+    expect(screen.getByText('Majestoso')).toBeInTheDocument();
+  });
+
+  it('não exibe produtos fora dos destaques', () => {
+    render(<FeaturedCarousel />);
     expect(screen.queryByText('Braguinha')).not.toBeInTheDocument();
+  });
+
+  it('renderiza os botões de navegação do carrossel', () => {
+    render(<FeaturedCarousel />);
+    expect(
+      screen.getByRole('button', { name: 'Ver destaques anteriores' }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole('button', { name: 'Ver mais destaques' }),
+    ).toBeInTheDocument();
   });
 });
