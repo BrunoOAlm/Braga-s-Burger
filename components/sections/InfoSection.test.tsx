@@ -3,13 +3,22 @@ import { render, screen } from '@testing-library/react';
 import { InfoSection } from './InfoSection';
 
 describe('InfoSection', () => {
-  it('exibe horário, contato e link do Instagram', () => {
+  it('mostra os blocos de informação', () => {
     render(<InfoSection />);
-    expect(screen.getByText(/Horário/i)).toBeInTheDocument();
-    expect(screen.getByRole('link', { name: /WhatsApp/i })).toHaveAttribute(
-      'href',
-      expect.stringContaining('wa.me'),
-    );
-    expect(screen.getByRole('link', { name: /Instagram/i })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: 'Horário' })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: 'Entrega' })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: 'Formas de pagamento' })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: 'Contato' })).toBeInTheDocument();
+  });
+
+  it('linka o WhatsApp real', () => {
+    render(<InfoSection />);
+    const wpp = screen.getByRole('link', { name: /WhatsApp/ });
+    expect(wpp).toHaveAttribute('href', 'https://wa.me/5521984019048');
+  });
+
+  it('inclui a consulta de taxa por bairro', () => {
+    render(<InfoSection />);
+    expect(screen.getByLabelText(/bairro/i)).toBeInTheDocument();
   });
 });

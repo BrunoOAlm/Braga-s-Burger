@@ -14,8 +14,19 @@ describe('Gallery', () => {
     await userEvent.click(screen.getAllByRole('button', { name: /Ampliar foto/ })[0]);
     expect(screen.getByRole('dialog')).toBeInTheDocument();
     await userEvent.click(screen.getByRole('button', { name: 'Fechar' }));
-    await waitFor(() =>
-      expect(screen.queryByRole('dialog')).not.toBeInTheDocument(),
-    );
+    await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
+  });
+
+  it('move o foco para o botão Fechar ao abrir o lightbox', async () => {
+    render(<Gallery />);
+    await userEvent.click(screen.getAllByRole('button', { name: /Ampliar foto/ })[0]);
+    expect(screen.getByRole('button', { name: 'Fechar' })).toHaveFocus();
+  });
+
+  it('fecha com a tecla Escape', async () => {
+    render(<Gallery />);
+    await userEvent.click(screen.getAllByRole('button', { name: /Ampliar foto/ })[0]);
+    await userEvent.keyboard('{Escape}');
+    await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
   });
 });

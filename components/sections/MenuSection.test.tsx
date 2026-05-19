@@ -1,21 +1,24 @@
 import { describe, it, expect } from 'vitest';
-import { render, screen, waitFor } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { MenuSection } from './MenuSection';
 
 describe('MenuSection', () => {
-  it('mostra todos os produtos por padrão', () => {
+  it('mostra o título do cardápio', () => {
     render(<MenuSection />);
-    expect(screen.getByText('Cheese Salada')).toBeInTheDocument();
-    expect(screen.getByText('Milkshake de Ovomaltine')).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: 'Nosso cardápio' })).toBeInTheDocument();
   });
 
-  it('filtra os produtos ao clicar numa categoria', async () => {
+  it('em "Todos" mostra os blocos de categoria com cabeçalho', () => {
     render(<MenuSection />);
-    await userEvent.click(screen.getByRole('button', { name: 'Bebidas' }));
-    expect(screen.getByText('Refrigerante Lata')).toBeInTheDocument();
-    await waitFor(() =>
-      expect(screen.queryByText('Cheese Salada')).not.toBeInTheDocument(),
-    );
+    expect(screen.getByRole('heading', { name: 'Burgers' })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: 'Bebidas' })).toBeInTheDocument();
+  });
+
+  it('ao escolher uma categoria mostra só ela', async () => {
+    render(<MenuSection />);
+    await userEvent.click(screen.getByRole('radio', { name: 'Bebidas' }));
+    expect(screen.queryByRole('heading', { name: 'Burgers' })).not.toBeInTheDocument();
+    expect(screen.getByText('Coca-Cola Lata')).toBeInTheDocument();
   });
 });

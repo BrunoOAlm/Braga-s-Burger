@@ -1,33 +1,53 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 
 const photos = [
-  '/images/galeria-1.jpg',
-  '/images/galeria-2.jpg',
-  '/images/galeria-3.jpg',
-  '/images/galeria-4.jpg',
-  '/images/galeria-5.jpg',
-  '/images/galeria-6.jpg',
+  '/gallery/gallery-1.webp',
+  '/gallery/gallery-2.webp',
+  '/gallery/gallery-3.webp',
+  '/gallery/gallery-4.webp',
+  '/gallery/gallery-5.webp',
+  '/gallery/rodizio.webp',
 ];
 
 export function Gallery() {
   const [openIndex, setOpenIndex] = useState<number | null>(null);
+  const closeRef = useRef<HTMLButtonElement>(null);
+  const triggerRef = useRef<HTMLElement | null>(null);
+
+  const open = (index: number) => {
+    triggerRef.current = document.activeElement as HTMLElement;
+    setOpenIndex(index);
+  };
+
+  const close = () => {
+    setOpenIndex(null);
+    triggerRef.current?.focus();
+  };
 
   useEffect(() => {
     if (openIndex === null) return;
+    closeRef.current?.focus();
+
     const onKey = (event: KeyboardEvent) => {
-      if (event.key === 'Escape') setOpenIndex(null);
+      if (event.key === 'Escape') {
+        close();
+      } else if (event.key === 'Tab') {
+        // Único elemento focável no diálogo: o botão Fechar → trava o foco.
+        event.preventDefault();
+        closeRef.current?.focus();
+      }
     };
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
   }, [openIndex]);
 
   return (
-    <section id="galeria" className="bg-brand-cream px-6 py-20">
+    <section id="galeria" className="bg-ink px-6 py-20">
       <div className="mx-auto max-w-6xl">
-        <h2 className="text-center font-heading text-3xl font-extrabold text-brand-dark md:text-4xl">
+        <h2 className="text-center font-heading text-3xl font-extrabold text-paper md:text-4xl">
           Galeria
         </h2>
         <div className="mt-10 grid grid-cols-2 gap-4 md:grid-cols-3">
@@ -36,8 +56,8 @@ export function Gallery() {
               key={photo}
               type="button"
               aria-label={`Ampliar foto ${index + 1}`}
-              onClick={() => setOpenIndex(index)}
-              className="aspect-square cursor-pointer overflow-hidden rounded-xl bg-brand-brown/20 bg-cover bg-center transition-transform duration-200 hover:scale-[1.03]"
+              onClick={() => open(index)}
+              className="aspect-square cursor-pointer overflow-hidden rounded-xl border border-line bg-cover bg-center transition-transform duration-200 hover:scale-[1.03]"
               style={{ backgroundImage: `url(${photo})` }}
             />
           ))}
@@ -53,19 +73,20 @@ export function Gallery() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            onClick={() => setOpenIndex(null)}
-            className="fixed inset-0 z-50 flex items-center justify-center bg-brand-dark/90 p-6"
+            onClick={close}
+            className="fixed inset-0 z-50 flex items-center justify-center bg-ink/95 p-6"
           >
             <button
+              ref={closeRef}
               type="button"
               aria-label="Fechar"
-              onClick={() => setOpenIndex(null)}
-              className="absolute right-6 top-6 cursor-pointer rounded-full bg-white/10 px-4 py-2 text-sm font-semibold text-white hover:bg-white/20"
+              onClick={close}
+              className="absolute right-6 top-6 cursor-pointer rounded-full border border-line bg-surface px-4 py-2 text-sm font-semibold text-paper hover:border-paper"
             >
               Fechar
             </button>
             <div
-              className="aspect-square w-full max-w-xl rounded-2xl bg-brand-brown/40 bg-cover bg-center"
+              className="aspect-square w-full max-w-xl rounded-2xl bg-surface bg-cover bg-center"
               style={{ backgroundImage: `url(${photos[openIndex]})` }}
             />
           </motion.div>

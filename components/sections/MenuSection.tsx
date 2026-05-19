@@ -1,23 +1,47 @@
 'use client';
 
 import { useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
 import { categories, products } from '@/data/menu';
 import { filterProducts } from '@/lib/filter';
+import type { Category } from '@/lib/types';
 import { CategoryFilter } from './CategoryFilter';
 import { ProductCard } from './ProductCard';
+import { ProductList } from './ProductList';
+
+function CategoryBlock({ category, showHeading }: { category: Category; showHeading: boolean }) {
+  const items = filterProducts(products, category.id);
+  if (items.length === 0) return null;
+
+  return (
+    <div className="mt-12">
+      {showHeading && (
+        <h3 className="mb-6 font-heading text-2xl font-bold text-paper">{category.name}</h3>
+      )}
+      {category.layout === 'list' ? (
+        <ProductList products={items} />
+      ) : (
+        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+          {items.map((product) => (
+            <ProductCard key={product.id} product={product} />
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
 
 export function MenuSection() {
   const [active, setActive] = useState<string | null>(null);
-  const visible = filterProducts(products, active);
+  const sorted = [...categories].sort((a, b) => a.order - b.order);
+  const visible = active === null ? sorted : sorted.filter((c) => c.id === active);
 
   return (
-    <section id="cardapio" className="bg-brand-cream px-6 py-20">
+    <section id="cardapio" className="bg-ink px-6 py-20">
       <div className="mx-auto max-w-6xl">
-        <h2 className="text-center font-heading text-3xl font-extrabold text-brand-dark md:text-4xl">
+        <h2 className="text-center font-heading text-3xl font-extrabold text-paper md:text-4xl">
           Nosso cardápio
         </h2>
-        <p className="mt-2 text-center text-brand-dark/60">
+        <p className="mt-2 text-center text-muted">
           Escolha uma categoria e monte seu pedido.
         </p>
 
@@ -25,25 +49,9 @@ export function MenuSection() {
           <CategoryFilter categories={categories} active={active} onChange={setActive} />
         </div>
 
-        <motion.div
-          layout
-          className="mt-10 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3"
-        >
-          <AnimatePresence mode="popLayout">
-            {visible.map((product) => (
-              <motion.div
-                key={product.id}
-                layout
-                initial={{ opacity: 0, scale: 0.95 }}
-                animate={{ opacity: 1, scale: 1 }}
-                exit={{ opacity: 0, scale: 0.95 }}
-                transition={{ duration: 0.2 }}
-              >
-                <ProductCard product={product} />
-              </motion.div>
-            ))}
-          </AnimatePresence>
-        </motion.div>
+        {visible.map((category) => (
+          <CategoryBlock key={category.id} category={category} showHeading={active === null} />
+        ))}
       </div>
     </section>
   );

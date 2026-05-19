@@ -1,65 +1,64 @@
 'use client';
 
-import { useEffect, useState } from 'react';
-import { AnimatePresence, motion, useReducedMotion } from 'framer-motion';
+import { motion, useReducedMotion } from 'framer-motion';
 import { Button } from '@/components/ui/Button';
-import { BurgerRain } from './BurgerRain';
-import { hasSeenIntro, markIntroSeen } from '@/lib/intro';
+import { Logo } from '@/components/ui/Logo';
 
 export function HeroSection() {
   const reduceMotion = useReducedMotion();
-  // começa como false no servidor; o efeito decide no cliente
-  const [introRunning, setIntroRunning] = useState(false);
-
-  useEffect(() => {
-    // hasSeenIntro() lê sessionStorage — não disponível no servidor.
-    // O setState é intencional: sincroniza o estado inicial com a realidade
-    // do cliente após a hidratação (padrão de "portão de intro" único por sessão).
-    if (!hasSeenIntro() && !reduceMotion) {
-      // eslint-disable-next-line react-hooks/set-state-in-effect
-      setIntroRunning(true);
-    }
-  }, [reduceMotion]);
-
-  const finishIntro = () => {
-    markIntroSeen();
-    setIntroRunning(false);
-  };
+  const entrance = (delay: number) => ({
+    initial: { opacity: 0, y: 16 },
+    animate: { opacity: 1, y: 0 },
+    transition: reduceMotion
+      ? { duration: 0 }
+      : { duration: 0.5, delay, ease: 'easeOut' as const },
+  });
 
   return (
-    <section className="relative flex min-h-screen flex-col items-center justify-center overflow-hidden bg-brand-dark px-6 text-center">
-      <AnimatePresence>
-        {introRunning && (
-          <motion.div
-            key="intro"
-            className="absolute inset-0 z-20 bg-brand-dark"
-            initial={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.6 }}
-          >
-            <BurgerRain onComplete={finishIntro} />
-            <button
-              type="button"
-              onClick={finishIntro}
-              className="absolute bottom-8 left-1/2 -translate-x-1/2 cursor-pointer rounded-full bg-white/10 px-5 py-2 text-sm font-semibold text-white hover:bg-white/20"
-            >
-              Pular
-            </button>
-          </motion.div>
-        )}
-      </AnimatePresence>
+    <section className="relative flex min-h-screen flex-col items-center justify-center overflow-hidden bg-ink px-6 text-center">
+      {!reduceMotion && (
+        <video
+          className="absolute inset-0 h-full w-full object-cover"
+          autoPlay
+          muted
+          loop
+          playsInline
+          poster="/videos/hero-poster.jpg"
+          aria-hidden="true"
+        >
+          <source src="/videos/hero-bg.mp4" type="video/mp4" />
+        </video>
+      )}
+      <div
+        className="absolute inset-0 bg-gradient-to-b from-ink/70 via-ink/55 to-ink/85"
+        aria-hidden="true"
+      />
 
-      <p className="mb-4 font-body text-sm uppercase tracking-[0.3em] text-brand-gold">
-        Hamburgueria artesanal
-      </p>
-      <h1 className="font-heading text-5xl font-extrabold text-white md:text-7xl">
-        Braga&apos;s Burger
-      </h1>
-      <p className="mt-4 max-w-md text-base text-white/70">
-        Os melhores hambúrgueres da Zona Norte, feitos na hora e entregues quentinhos.
-      </p>
-      <div className="mt-8">
-        <Button href="#cardapio">Ver cardápio</Button>
+      <div className="relative z-10 flex flex-col items-center">
+        <h1 className="sr-only">Braga&apos;s Burger</h1>
+
+        <motion.div
+          initial={reduceMotion ? false : { opacity: 0, scale: 0.9 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={reduceMotion ? { duration: 0 } : { duration: 0.6, ease: 'easeOut' }}
+        >
+          <Logo size={140} priority />
+        </motion.div>
+
+        <motion.p
+          className="mt-6 text-xs uppercase tracking-[0.3em] text-muted"
+          {...entrance(0.25)}
+        >
+          Hamburgueria artesanal
+        </motion.p>
+
+        <motion.p className="mt-3 max-w-md text-base text-paper/80" {...entrance(0.4)}>
+          Os melhores hambúrgueres da Zona Norte, feitos na hora.
+        </motion.p>
+
+        <motion.div className="mt-8" {...entrance(0.55)}>
+          <Button href="#cardapio">Ver cardápio</Button>
+        </motion.div>
       </div>
     </section>
   );

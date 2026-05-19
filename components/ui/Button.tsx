@@ -8,8 +8,8 @@ type ButtonProps = {
 };
 
 const styles: Record<NonNullable<ButtonProps['variant']>, string> = {
-  primary: 'bg-brand-orange text-white hover:bg-brand-orange-light',
-  ghost: 'bg-transparent text-brand-dark border border-brand-dark/20 hover:border-brand-orange',
+  primary: 'bg-white text-ink hover:bg-paper',
+  ghost: 'bg-transparent text-paper border border-line hover:border-paper',
 };
 
 export function Button({ children, href, onClick, variant = 'primary' }: ButtonProps) {
