@@ -26,3 +26,11 @@ class IntersectionObserverStub {
   }
 }
 vi.stubGlobal('IntersectionObserver', IntersectionObserverStub);
+
+// jsdom não implementa ResizeObserver — necessário para o Embla Carousel
+class ResizeObserverStub {
+  observe() {}
+  unobserve() {}
+  disconnect() {}
+}
+vi.stubGlobal('ResizeObserver', ResizeObserverStub);
