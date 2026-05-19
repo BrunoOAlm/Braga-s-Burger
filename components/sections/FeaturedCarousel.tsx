@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { useReducedMotion } from 'framer-motion';
 import useEmblaCarousel from 'embla-carousel-react';
-import Autoplay from 'embla-carousel-autoplay';
+import AutoScroll from 'embla-carousel-auto-scroll';
 import { products } from '@/data/menu';
 import { ProductCard } from './ProductCard';
 
@@ -12,15 +12,15 @@ export function FeaturedCarousel() {
   const reduceMotion = useReducedMotion();
 
   // Mantém a instância do plugin estável entre renders (useState lazy init).
-  // Criar Autoplay() a cada render geraria objetos descartáveis sem necessidade.
-  const [autoplay] = useState(() =>
-    Autoplay({ delay: 4500, stopOnInteraction: false, stopOnMouseEnter: true }),
+  // `speed` é em pixels por quadro a 60fps — 2 ≈ 120px/s (deriva suave e visível).
+  const [autoScroll] = useState(() =>
+    AutoScroll({ speed: 2, stopOnInteraction: false, stopOnMouseEnter: true }),
   );
 
-  // Com prefers-reduced-motion, o array de plugins fica vazio → sem autoplay.
+  // Com prefers-reduced-motion, o array de plugins fica vazio → sem auto-scroll.
   const [emblaRef, emblaApi] = useEmblaCarousel(
     { loop: true, align: 'start' },
-    reduceMotion ? [] : [autoplay],
+    reduceMotion ? [] : [autoScroll],
   );
 
   const arrowClass =
@@ -57,9 +57,11 @@ export function FeaturedCarousel() {
           </button>
 
           <div className="flex-1 overflow-hidden" ref={emblaRef}>
-            <div className="flex gap-6">
+            {/* Espaçamento por slide (mr-6), não por gap do container —
+                evita slides "colados" no ponto de wrap do loop infinito. */}
+            <div className="flex">
               {featured.map((product) => (
-                <div key={product.id} className="w-72 shrink-0">
+                <div key={product.id} className="mr-6 w-72 shrink-0">
                   <ProductCard product={product} />
                 </div>
               ))}

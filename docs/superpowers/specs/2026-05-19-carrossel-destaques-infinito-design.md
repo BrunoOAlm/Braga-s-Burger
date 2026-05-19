@@ -36,11 +36,17 @@ antigo.
 | Tema | Decisão |
 |------|---------|
 | Tipo de loop | Loop **perfeito** — os cards se repetem continuamente, sem "rebobinada" visível |
-| Movimento | Autoplay (avanço automático) **+** navegação manual por setas e arrasto |
-| Intervalo do autoplay | **4,5 s** entre avanços |
+| Movimento | **Auto-scroll contínuo lento** (deriva suave) **+** navegação manual por setas e arrasto |
+| Velocidade do auto-scroll | `speed: 2` (≈ 120 px/s a 60fps — deriva suave e visível) |
 | Pausa | Pausa no hover do mouse e quando algo dentro recebe foco de teclado; retoma depois |
-| Abordagem técnica | Biblioteca **Embla Carousel** (`loop: true` nativo + plugin de autoplay) |
-| Movimento reduzido | Com `prefers-reduced-motion`, o autoplay **não** roda; setas/arrasto seguem |
+| Abordagem técnica | Biblioteca **Embla Carousel** (`loop: true` nativo + plugin **auto-scroll**) |
+| Movimento reduzido | Com `prefers-reduced-motion`, o auto-scroll **não** roda; setas/arrasto seguem |
+
+> **Nota de revisão (19/05):** o spec original previa *step autoplay* (avanço discreto a cada 4,5 s)
+> com `embla-carousel-autoplay`. Na verificação visual, o cliente preferiu uma **deriva contínua
+> lenta** — uma mudança de UX de "carrossel que pula de tempos em tempos" para "carrossel que
+> desliza levemente o tempo todo". Trocamos o plugin para `embla-carousel-auto-scroll` (mesma
+> família, mesma API de pausa/retomada).
 
 ---
 
@@ -49,7 +55,7 @@ antigo.
 Instalar duas bibliotecas (mesma versão major — 8.x):
 
 - `embla-carousel-react` — hook `useEmblaCarousel` para React.
-- `embla-carousel-autoplay` — plugin oficial de autoplay.
+- `embla-carousel-auto-scroll` — plugin oficial de **deriva contínua**.
 
 Juntas pesam ~6 KB (gzip). São agnósticas de framework — não dependem de detalhes do Next.
 Compatíveis com React 19 (verificar na instalação que a versão resolvida é a 8.x).
@@ -75,7 +81,11 @@ Compatíveis com React 19 (verificar na instalação que a versão resolvida é 
 - O `ref` do Embla vai no **viewport** (`overflow-hidden`).
 - O loop do Embla **não duplica nós no DOM** — ele reposiciona os slides via `transform`.
   Logo, continuam existindo exatamente 6 slides no DOM (um por produto `featured`).
-- Largura de slide e `gap` ficam iguais aos de hoje: `w-72` (288px) e `gap-6`.
+- Largura de slide: `w-72` (288px).
+- **Espaçamento por slide, não por container:** cada slide tem `mr-6` em vez de o container
+  ter `gap-6`. Com `loop: true`, o Embla transloca os slides individualmente para fechar o
+  ciclo, e um `gap` aplicado pelo flex container não acompanha esse transladar — os slides
+  ficam "colados" no ponto de wrap. Margin direita no próprio slide acompanha o transform.
 
 ### Inicialização
 
@@ -112,23 +122,24 @@ e as classes de snap nativo (`snap-x`, `snap-mandatory`, `snap-start`, ocultar s
 
 ---
 
-## 5. Autoplay e acessibilidade
+## 5. Auto-scroll e acessibilidade
 
 Configuração do plugin:
 
 ```ts
-Autoplay({ delay: 4500, stopOnInteraction: false, stopOnMouseEnter: true })
+AutoScroll({ speed: 2, stopOnInteraction: false, stopOnMouseEnter: true })
 ```
 
-- `delay: 4500` — avança a cada 4,5 s.
+- `speed: 2` — pixels por quadro a 60fps, ou seja, ~120 px/s. O carrossel desliza
+  continuamente em vez de "pular" de slide em slide. Valores maiores aceleram; 1 reduz pela metade.
 - `stopOnMouseEnter: true` — pausa enquanto o mouse está sobre o carrossel e **retoma** ao sair.
-- `stopOnInteraction: false` — depois de clicar numa seta (ou arrastar), o autoplay **volta** a
-  rodar, em vez de parar de vez.
+- `stopOnInteraction: false` — depois de clicar numa seta (ou arrastar), o auto-scroll **volta**
+  a rodar, em vez de parar de vez.
 - `stopOnFocusIn` (padrão `true`) — pausa quando um elemento interno recebe foco de teclado,
   cobrindo quem navega sem mouse (WCAG 2.2.2 "Pause, Stop, Hide").
 
 **Movimento reduzido:** o componente lê `useReducedMotion()` (framer-motion, já em uso). Quando
-verdadeiro, o array de plugins passado ao `useEmblaCarousel` fica vazio — sem autoplay nenhum.
+verdadeiro, o array de plugins passado ao `useEmblaCarousel` fica vazio — sem auto-scroll nenhum.
 As setas e o arrasto continuam funcionando normalmente. (`useReducedMotion()` pode retornar
 `null` antes de resolver; tratar `null` como "sem movimento reduzido".)
 
@@ -187,8 +198,8 @@ Ao final, rodar `npm test`, `npm run lint` e `npm run build` — todos devem pas
 
 ## 9. Critérios de sucesso
 
-- O carrossel de destaques avança sozinho a cada 4,5 s e dá voltas infinitas, sem "rebobinada"
-  visível.
+- O carrossel de destaques desliza continuamente em ritmo suave (~120 px/s) e dá voltas
+  infinitas, sem "rebobinada" visível e sem cards "colados" no ponto de wrap.
 - Passar o mouse por cima pausa o avanço; tirar o mouse retoma.
 - As setas (desktop) navegam para os lados e nunca ficam desabilitadas; o autoplay retoma
   após o clique.
