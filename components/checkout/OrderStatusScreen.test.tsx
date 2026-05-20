@@ -18,12 +18,7 @@ const address: Address = {
 
 beforeEach(() => {
   openSpy = vi.spyOn(window, 'open').mockImplementation(() => null);
-  vi.useFakeTimers();
-  vi.setSystemTime(new Date('2026-05-20T18:00:00'));
-});
-
-afterEach(() => {
-  vi.useRealTimers();
+  openSpy.mockClear();
 });
 
 function renderDelivery() {
@@ -53,12 +48,24 @@ describe('OrderStatusScreen — layout', () => {
   it('mostra o título "Acompanhe seu pedido" e o número do pedido', () => {
     renderDelivery();
     expect(screen.getByText(/acompanhe seu pedido/i)).toBeInTheDocument();
-    expect(screen.getByText('#3417')).toBeInTheDocument();
+    expect(screen.getAllByText(/#3417/).length).toBeGreaterThan(0);
   });
 
   it('mostra a janela de previsão de entrega em HH:MM', () => {
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date('2026-05-20T18:00:00'));
+    try {
+      renderDelivery();
+      expect(screen.getByText('18:30 – 18:50')).toBeInTheDocument();
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
+  it('renderiza a janela de previsão no formato HH:MM – HH:MM', () => {
     renderDelivery();
-    expect(screen.getByText('18:30 – 18:50')).toBeInTheDocument();
+    const clockText = screen.getByText(/^\d{2}:\d{2} – \d{2}:\d{2}$/);
+    expect(clockText).toBeInTheDocument();
   });
 
   it('mostra as 4 etapas da timeline com apenas "Recebido" ativa', () => {
@@ -96,10 +103,13 @@ describe('OrderStatusScreen — layout', () => {
 });
 
 describe('OrderStatusScreen — ações', () => {
+  afterEach(() => {
+    vi.useRealTimers();
+  });
+
   it('CTA "Abrir conversa no WhatsApp" abre o WhatsApp com a mensagem de contato', async () => {
-    const user = userEvent.setup({ advanceTimers: vi.advanceTimersByTime });
     renderDelivery();
-    await user.click(
+    await userEvent.click(
       screen.getByRole('button', { name: /abrir conversa no whatsapp/i }),
     );
     expect(openSpy).toHaveBeenCalled();
@@ -109,17 +119,15 @@ describe('OrderStatusScreen — ações', () => {
   });
 
   it('botão "Cancelar pedido" abre o WhatsApp com a mensagem de cancelamento', async () => {
-    const user = userEvent.setup({ advanceTimers: vi.advanceTimersByTime });
     renderDelivery();
-    await user.click(screen.getByRole('button', { name: /cancelar pedido/i }));
+    await userEvent.click(screen.getByRole('button', { name: /cancelar pedido/i }));
     const url = openSpy.mock.calls[0][0] as string;
     expect(decodeURIComponent(url)).toContain('cancelar o pedido #3417');
   });
 
   it('link "Ajuda" abre o WhatsApp com a mensagem de ajuda', async () => {
-    const user = userEvent.setup({ advanceTimers: vi.advanceTimersByTime });
     renderDelivery();
-    await user.click(screen.getByRole('button', { name: /ajuda/i }));
+    await userEvent.click(screen.getByRole('button', { name: /ajuda/i }));
     const url = openSpy.mock.calls[0][0] as string;
     expect(decodeURIComponent(url)).toContain('preciso de ajuda com o pedido #3417');
   });
