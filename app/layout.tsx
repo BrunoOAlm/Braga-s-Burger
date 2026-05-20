@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import { Poppins, Inter } from 'next/font/google';
 import './globals.css';
+import { CartLauncher } from '@/components/cart/CartLauncher';
 
 const poppins = Poppins({
   subsets: ['latin'],
@@ -32,7 +33,10 @@ export default function RootLayout({
 }) {
   return (
     <html lang="pt-BR" className={`${poppins.variable} ${inter.variable} antialiased`}>
-      <body>{children}</body>
+      <body>
+        {children}
+        <CartLauncher />
+      </body>
     </html>
   );
 }
