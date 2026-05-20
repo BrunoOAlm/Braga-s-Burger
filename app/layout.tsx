@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import { Poppins, Inter } from 'next/font/google';
 import './globals.css';
 import { CartLauncher } from '@/components/cart/CartLauncher';
+import { RegisterServiceWorker } from '@/components/pwa/RegisterServiceWorker';
 
 const poppins = Poppins({
   subsets: ['latin'],
@@ -36,6 +37,7 @@ export default function RootLayout({
       <body>
         {children}
         <CartLauncher />
+        <RegisterServiceWorker />
       </body>
     </html>
   );
