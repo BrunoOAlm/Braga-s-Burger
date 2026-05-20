@@ -3,6 +3,7 @@ import { Poppins, Inter } from 'next/font/google';
 import './globals.css';
 import { CartLauncher } from '@/components/cart/CartLauncher';
 import { RegisterServiceWorker } from '@/components/pwa/RegisterServiceWorker';
+import { InstallBanner } from '@/components/ui/InstallBanner';
 
 const poppins = Poppins({
   subsets: ['latin'],
@@ -37,6 +38,7 @@ export default function RootLayout({
       <body>
         {children}
         <CartLauncher />
+        <InstallBanner />
         <RegisterServiceWorker />
       </body>
     </html>
