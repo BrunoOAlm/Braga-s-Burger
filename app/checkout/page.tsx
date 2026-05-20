@@ -58,7 +58,15 @@ export default function CheckoutPage() {
   }
 
   if (step === 'sent' && orderId && sentEstimate) {
-    return <OrderStatusScreen orderId={orderId} estimatedMinutes={sentEstimate} />;
+    return (
+      <OrderStatusScreen
+        orderId={orderId}
+        estimatedMinutes={sentEstimate}
+        method={method}
+        customer={customer}
+        address={method === 'delivery' && address ? address : undefined}
+      />
+    );
   }
 
   const submit = () => {
