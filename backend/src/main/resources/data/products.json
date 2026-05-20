@@ -1,0 +1,7 @@
+[
+  { "id": "chicken",         "categoryId": "burgers", "name": "Chicken",         "price": 25.90, "available": true },
+  { "id": "crispy-catupiry", "categoryId": "burgers", "name": "Crispy Catupiry", "price": 39.90, "available": true },
+  { "id": "fritas-grande",   "categoryId": "porcoes", "name": "Fritas Grande",   "price": 29.90, "available": true },
+  { "id": "coca-cola-2l",    "categoryId": "bebidas", "name": "Coca-Cola 2L",    "price": 14.90, "available": true },
+  { "id": "esgotado-test",   "categoryId": "burgers", "name": "Teste Esgotado",  "price": 10.00, "available": false }
+]
