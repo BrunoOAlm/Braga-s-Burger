@@ -1,5 +1,9 @@
 import { describe, it, expect } from 'vitest';
-import { buildWhatsAppMessage } from './order-message';
+import {
+  buildWhatsAppMessage,
+  buildContactMessage,
+  buildHelpMessage,
+} from './order-message';
 import type { OrderForMessage } from './order-message';
 import type { Product, Category } from './types';
 
@@ -190,5 +194,19 @@ describe('buildWhatsAppMessage', () => {
     o.payment = 'cash';
     o.changeFor = undefined;
     expect(buildWhatsAppMessage(o)).not.toContain('Troco');
+  });
+});
+
+describe('buildContactMessage', () => {
+  it('monta uma mensagem curta com o número do pedido', () => {
+    expect(buildContactMessage('#3417')).toBe('Olá, sobre o pedido #3417.');
+  });
+});
+
+describe('buildHelpMessage', () => {
+  it('monta um pedido de ajuda com o número do pedido', () => {
+    expect(buildHelpMessage('#3417')).toBe(
+      'Olá, preciso de ajuda com o pedido #3417.',
+    );
   });
 });
