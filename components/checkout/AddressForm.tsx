@@ -22,7 +22,13 @@ export function AddressForm({ value, onChange }: Props) {
   const [neighborhood, setNeighborhood] = useState(value?.neighborhood ?? '');
   const [complement, setComplement] = useState(value?.complement ?? '');
   const [reference, setReference] = useState(value?.reference ?? '');
-  const [neighborhoodOutOfArea, setNeighborhoodOutOfArea] = useState(false);
+
+  // Estado derivado: computado no render, sem useEffect (regra react-hooks/set-state-in-effect)
+  const neighborhoodOutOfArea =
+    neighborhood !== '' &&
+    !deliveryAreas.find(
+      (a) => a.neighborhood.toLowerCase() === neighborhood.toLowerCase(),
+    );
 
   // Busca na ViaCEP quando o CEP tem 8 dígitos
   useEffect(() => {
@@ -45,18 +51,6 @@ export function AddressForm({ value, onChange }: Props) {
       cancelled = true;
     };
   }, [cep]);
-
-  // Avisa se o bairro não é atendido
-  useEffect(() => {
-    if (!neighborhood) {
-      setNeighborhoodOutOfArea(false);
-      return;
-    }
-    const match = deliveryAreas.find(
-      (a) => a.neighborhood.toLowerCase() === neighborhood.toLowerCase(),
-    );
-    setNeighborhoodOutOfArea(!match);
-  }, [neighborhood]);
 
   // Propaga para fora sempre que algo muda
   useEffect(() => {
