@@ -4,6 +4,7 @@ import Image from 'next/image';
 import { motion, useReducedMotion } from 'framer-motion';
 import type { Product } from '@/lib/types';
 import { formatProductPrice } from '@/lib/format';
+import { AddToCartButton } from '@/components/cart/AddToCartButton';
 
 const categoryIcon: Record<string, string> = {
   tabuas: '🍽️',
@@ -57,9 +58,12 @@ export function ProductCard({ product }: ProductCardProps) {
         {product.description && (
           <p className="mt-1 flex-1 text-sm text-muted">{product.description}</p>
         )}
-        <p className="mt-3 font-heading text-lg font-bold text-paper">
-          {formatProductPrice(product)}
-        </p>
+        <div className="mt-3 flex items-center justify-between gap-3">
+          <p className="font-heading text-lg font-bold text-paper">
+            {formatProductPrice(product)}
+          </p>
+          <AddToCartButton product={product} />
+        </div>
       </div>
     </motion.article>
   );
