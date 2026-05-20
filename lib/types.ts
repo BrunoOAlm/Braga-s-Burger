@@ -21,3 +21,35 @@ export interface DeliveryArea {
   neighborhood: string;
   fee: number; // taxa de entrega em reais
 }
+
+export interface CartItem {
+  id: string; // id único do item no carrinho (não confundir com product.id)
+  product: Product;
+  quantity: number;
+  notes: string; // observação livre ("sem cebola"); '' se nenhuma
+  // futuro: options?: SelectedOption[] — customização multi-step
+}
+
+export interface Coupon {
+  code: string;
+  type: 'percent' | 'fixed';
+  value: number; // 10 → 10% (percent) ou R$ 10 (fixed)
+  minSubtotal?: number; // subtotal mínimo (R$) para o cupom valer
+}
+
+export interface Address {
+  cep: string;
+  street: string;
+  number: string;
+  neighborhood: string;
+  complement?: string;
+  reference?: string;
+}
+
+export type DeliveryMethod = 'delivery' | 'pickup';
+export type PaymentMethod = 'pix' | 'cash' | 'credit' | 'debit';
+
+export interface Customer {
+  name: string;
+  phone: string;
+}
