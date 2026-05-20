@@ -40,3 +40,8 @@ __pycache__/
 
 # TypeScript build info
 *.tsbuildinfo
+
+# Backend
+backend/build/
+backend/.gradle/
+backend/.env

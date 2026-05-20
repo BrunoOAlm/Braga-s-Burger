@@ -1,0 +1,12 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/bragas
+    username: bragas
+    password: bragas
+  jpa:
+    show-sql: false
+
+logging:
+  level:
+    root: INFO
+    com.bragas.api: DEBUG
