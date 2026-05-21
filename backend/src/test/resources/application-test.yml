@@ -1,0 +1,28 @@
+spring:
+  main:
+    allow-bean-definition-overriding: true
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    properties:
+      hibernate.format_sql: false
+
+logging:
+  level:
+    org.hibernate.SQL: WARN
+
+app:
+  store:
+    minOrder: 25.00
+    averagePrepTime: 25
+    openingHours:
+      sun: { open: "18:00", close: "00:00" }
+      tue: { open: "18:00", close: "23:40" }
+      wed: { open: "18:00", close: "23:40" }
+      thu: { open: "18:00", close: "23:40" }
+      fri: { open: "18:00", close: "00:00" }
+      sat: { open: "18:00", close: "00:00" }
+  admin:
+    token: test-admin-token
+  cors:
+    allowedOrigins: []

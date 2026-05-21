@@ -1,0 +1,5 @@
+[
+  { "neighborhood": "Higienópolis", "fee": 4.99 },
+  { "neighborhood": "Tijuca",       "fee": 6.99 },
+  { "neighborhood": "Méier",        "fee": 7.99 }
+]
