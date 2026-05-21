@@ -1,5 +1,6 @@
 package com.bragas.api.store;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.time.DayOfWeek;
@@ -14,6 +15,7 @@ public class StoreStatus {
 
     private final Map<String, OpeningHours> hours;
 
+    @Autowired
     public StoreStatus(StoreProperties props) {
         this(props.openingHours());
     }

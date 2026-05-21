@@ -1,6 +1,7 @@
 package com.bragas.api.order.pricing;
 
 import com.bragas.api.order.OrderRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.concurrent.ThreadLocalRandom;
@@ -15,6 +16,7 @@ public class DisplayIdGenerator {
     private final Predicate<String> existsInRepository;
     private final Supplier<String> candidateSource;
 
+    @Autowired
     public DisplayIdGenerator(OrderRepository repo) {
         this(repo::existsByDisplayId, DisplayIdGenerator::randomCandidate);
     }
