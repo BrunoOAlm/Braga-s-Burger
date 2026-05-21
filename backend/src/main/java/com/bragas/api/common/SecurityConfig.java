@@ -1,6 +1,5 @@
 package com.bragas.api.common;
 
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -19,10 +18,9 @@ public class SecurityConfig {
     private final String adminToken;
     private final List<String> corsOrigins;
 
-    public SecurityConfig(@Value("${app.admin.token}") String adminToken,
-                          @Value("${app.cors.allowedOrigins}") List<String> corsOrigins) {
-        this.adminToken = adminToken;
-        this.corsOrigins = corsOrigins;
+    public SecurityConfig(AppProperties props) {
+        this.adminToken = props.admin() == null ? null : props.admin().token();
+        this.corsOrigins = props.cors() == null ? null : props.cors().allowedOrigins();
     }
 
     @Bean
