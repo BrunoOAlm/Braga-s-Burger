@@ -1,0 +1,17 @@
+package com.bragas.api.common;
+
+import org.junit.jupiter.api.Test;
+
+import java.time.Clock;
+import java.time.ZoneId;
+
+import static org.assertj.core.api.Assertions.assertThat;
+
+class ClockConfigTest {
+
+    @Test
+    void clockIsInSaoPauloZone() {
+        Clock clock = new ClockConfig().clock();
+        assertThat(clock.getZone()).isEqualTo(ZoneId.of("America/Sao_Paulo"));
+    }
+}
