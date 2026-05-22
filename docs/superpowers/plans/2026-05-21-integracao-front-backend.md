@@ -1563,8 +1563,10 @@ ADMIN_TOKEN="dev-token"  # ou o valor em backend/.env
 curl -X PATCH "http://localhost:8080/api/v1/admin/orders/$ORDER_ID/status" \
   -H "Content-Type: application/json" \
   -H "X-Admin-Token: $ADMIN_TOKEN" \
-  -d '{"status":"PREPARING"}'
+  -d '{"to":"PREPARING"}'
 ```
+
+> Body do PATCH usa `{"to":"..."}`, **não** `{"status":"..."}`. Descoberto no smoke E2E de 2026-05-21.
 
 Volte para a aba do `OrderStatusScreen` aberto e espere até 10s. Verifica:
 - A timeline avança: agora "Em preparo" tem `aria-current` e o item 0 não.
