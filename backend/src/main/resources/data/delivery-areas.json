@@ -1,5 +1,158 @@
 [
-  { "neighborhood": "Higienópolis", "fee": 4.99 },
-  { "neighborhood": "Tijuca",       "fee": 6.99 },
-  { "neighborhood": "Méier",        "fee": 7.99 }
+  {
+    "neighborhood": "Abolição",
+    "fee": 9.99
+  },
+  {
+    "neighborhood": "Adeus",
+    "fee": 6.99
+  },
+  {
+    "neighborhood": "Amorim",
+    "fee": 6.99
+  },
+  {
+    "neighborhood": "Arará",
+    "fee": 5.99
+  },
+  {
+    "neighborhood": "Benfica",
+    "fee": 6.99
+  },
+  {
+    "neighborhood": "Bonsucesso",
+    "fee": 6.99
+  },
+  {
+    "neighborhood": "Cachambi",
+    "fee": 6.99
+  },
+  {
+    "neighborhood": "CAH",
+    "fee": 4.99
+  },
+  {
+    "neighborhood": "Complexo do Alemão",
+    "fee": 7.99
+  },
+  {
+    "neighborhood": "Del Castilho",
+    "fee": 5.99
+  },
+  {
+    "neighborhood": "Engenho da Rainha",
+    "fee": 8.99
+  },
+  {
+    "neighborhood": "Engenho de Dentro",
+    "fee": 8.99
+  },
+  {
+    "neighborhood": "Engenho Novo",
+    "fee": 7.99
+  },
+  {
+    "neighborhood": "Grajaú",
+    "fee": 10.99
+  },
+  {
+    "neighborhood": "Higienópolis",
+    "fee": 4.99
+  },
+  {
+    "neighborhood": "Inhaúma",
+    "fee": 6.99
+  },
+  {
+    "neighborhood": "Jacaré",
+    "fee": 5.99
+  },
+  {
+    "neighborhood": "Jacarezinho",
+    "fee": 5.99
+  },
+  {
+    "neighborhood": "Mandela",
+    "fee": 5.99
+  },
+  {
+    "neighborhood": "Mangueira",
+    "fee": 7.99
+  },
+  {
+    "neighborhood": "Manguinhos",
+    "fee": 5.99
+  },
+  {
+    "neighborhood": "Maracanã",
+    "fee": 9.99
+  },
+  {
+    "neighborhood": "Maria da Graça",
+    "fee": 5.99
+  },
+  {
+    "neighborhood": "Méier",
+    "fee": 9.99
+  },
+  {
+    "neighborhood": "Olaria",
+    "fee": 7.99
+  },
+  {
+    "neighborhood": "Penha",
+    "fee": 9.99
+  },
+  {
+    "neighborhood": "Penha Circular",
+    "fee": 10.99
+  },
+  {
+    "neighborhood": "Pilares",
+    "fee": 8.99
+  },
+  {
+    "neighborhood": "Ramos",
+    "fee": 6.99
+  },
+  {
+    "neighborhood": "Riachuelo",
+    "fee": 6.99
+  },
+  {
+    "neighborhood": "Rocha",
+    "fee": 7.99
+  },
+  {
+    "neighborhood": "Sampaio",
+    "fee": 7.99
+  },
+  {
+    "neighborhood": "São Cristóvão",
+    "fee": 8.99
+  },
+  {
+    "neighborhood": "São Francisco Xavier",
+    "fee": 7.99
+  },
+  {
+    "neighborhood": "Tijuca",
+    "fee": 9.99
+  },
+  {
+    "neighborhood": "Todos os Santos",
+    "fee": 7.99
+  },
+  {
+    "neighborhood": "Triagem",
+    "fee": 5.99
+  },
+  {
+    "neighborhood": "Varginha",
+    "fee": 5.99
+  },
+  {
+    "neighborhood": "Vila Isabel",
+    "fee": 9.99
+  }
 ]

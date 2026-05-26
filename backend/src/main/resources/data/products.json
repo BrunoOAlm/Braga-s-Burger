@@ -1,7 +1,590 @@
 [
-  { "id": "chicken",         "categoryId": "burgers", "name": "Chicken",         "price": 25.90, "available": true },
-  { "id": "crispy-catupiry", "categoryId": "burgers", "name": "Crispy Catupiry", "price": 39.90, "available": true },
-  { "id": "fritas-grande",   "categoryId": "porcoes", "name": "Fritas Grande",   "price": 29.90, "available": true },
-  { "id": "coca-cola-2l",    "categoryId": "bebidas", "name": "Coca-Cola 2L",    "price": 14.90, "available": true },
-  { "id": "esgotado-test",   "categoryId": "burgers", "name": "Teste Esgotado",  "price": 10.00, "available": false }
+  {
+    "id": "braguinha",
+    "categoryId": "burgers",
+    "name": "Braguinha",
+    "price": 22.9,
+    "available": true
+  },
+  {
+    "id": "chicken",
+    "categoryId": "burgers",
+    "name": "Chicken",
+    "price": 25.9,
+    "available": true
+  },
+  {
+    "id": "costela",
+    "categoryId": "burgers",
+    "name": "Costela",
+    "price": 33.9,
+    "available": true
+  },
+  {
+    "id": "crispy-catupiry",
+    "categoryId": "burgers",
+    "name": "Crispy Catupiry",
+    "price": 39.9,
+    "available": true
+  },
+  {
+    "id": "dogao-linguica",
+    "categoryId": "burgers",
+    "name": "Dogão Linguiça",
+    "price": 22.9,
+    "available": true
+  },
+  {
+    "id": "dogao-salsicha",
+    "categoryId": "burgers",
+    "name": "Dogão Salsicha",
+    "price": 22.9,
+    "available": true
+  },
+  {
+    "id": "duplo",
+    "categoryId": "burgers",
+    "name": "Duplo",
+    "price": 39.9,
+    "available": true
+  },
+  {
+    "id": "duplo-smash",
+    "categoryId": "burgers",
+    "name": "Duplo Smash",
+    "price": 34.9,
+    "available": true
+  },
+  {
+    "id": "epico",
+    "categoryId": "burgers",
+    "name": "Épico",
+    "price": 36.9,
+    "available": true
+  },
+  {
+    "id": "explosao-cheddar",
+    "categoryId": "burgers",
+    "name": "Explosão de Cheddar",
+    "price": 38.9,
+    "available": true
+  },
+  {
+    "id": "gourmet",
+    "categoryId": "burgers",
+    "name": "Gourmet",
+    "price": 29.9,
+    "available": true
+  },
+  {
+    "id": "kids-alice",
+    "categoryId": "burgers",
+    "name": "Kids Alice",
+    "price": 18.9,
+    "available": true
+  },
+  {
+    "id": "majestoso",
+    "categoryId": "burgers",
+    "name": "Majestoso",
+    "price": 37.9,
+    "available": true
+  },
+  {
+    "id": "triplo-smash",
+    "categoryId": "burgers",
+    "name": "Triplo Smash",
+    "price": 38.9,
+    "available": true
+  },
+  {
+    "id": "vegano",
+    "categoryId": "burgers",
+    "name": "Vegano",
+    "price": 34.9,
+    "available": true
+  },
+  {
+    "id": "trio-alice",
+    "categoryId": "trios",
+    "name": "Trio Alice",
+    "price": 28.8,
+    "available": true
+  },
+  {
+    "id": "trio-braguinha",
+    "categoryId": "trios",
+    "name": "Trio Braguinha",
+    "price": 32.8,
+    "available": true
+  },
+  {
+    "id": "trio-chicken",
+    "categoryId": "trios",
+    "name": "Trio Chicken",
+    "price": 35.8,
+    "available": true
+  },
+  {
+    "id": "trio-costela",
+    "categoryId": "trios",
+    "name": "Trio Costela",
+    "price": 43.8,
+    "available": true
+  },
+  {
+    "id": "trio-crispy-catupiry",
+    "categoryId": "trios",
+    "name": "Trio Crispy Catupiry",
+    "price": 49.8,
+    "available": true
+  },
+  {
+    "id": "trio-dogao-linguica",
+    "categoryId": "trios",
+    "name": "Trio Dogão Linguiça",
+    "price": 32.8,
+    "available": true
+  },
+  {
+    "id": "trio-dogao-salsicha",
+    "categoryId": "trios",
+    "name": "Trio Dogão Salsicha",
+    "price": 32.8,
+    "available": true
+  },
+  {
+    "id": "trio-duplo",
+    "categoryId": "trios",
+    "name": "Trio Duplo",
+    "price": 49.8,
+    "available": true
+  },
+  {
+    "id": "trio-duplo-smash",
+    "categoryId": "trios",
+    "name": "Trio Duplo Smash",
+    "price": 44.8,
+    "available": true
+  },
+  {
+    "id": "trio-epico",
+    "categoryId": "trios",
+    "name": "Trio Épico",
+    "price": 46.8,
+    "available": true
+  },
+  {
+    "id": "trio-explosao",
+    "categoryId": "trios",
+    "name": "Trio Explosão",
+    "price": 48.8,
+    "available": true
+  },
+  {
+    "id": "trio-gourmet",
+    "categoryId": "trios",
+    "name": "Trio Gourmet",
+    "price": 39.8,
+    "available": true
+  },
+  {
+    "id": "trio-majestoso",
+    "categoryId": "trios",
+    "name": "Trio Majestoso",
+    "price": 47.8,
+    "available": true
+  },
+  {
+    "id": "trio-triplo-smash",
+    "categoryId": "trios",
+    "name": "Trio Triplo Smash",
+    "price": 48.8,
+    "available": true
+  },
+  {
+    "id": "trio-vegano",
+    "categoryId": "trios",
+    "name": "Trio Vegano",
+    "price": 44.8,
+    "available": true
+  },
+  {
+    "id": "tabua-braga-chicken",
+    "categoryId": "tabuas",
+    "name": "Tábua Braga Chicken",
+    "price": 74.9,
+    "available": true
+  },
+  {
+    "id": "tabua-braguinha",
+    "categoryId": "tabuas",
+    "name": "Tábua Braguinha",
+    "price": 70.9,
+    "available": true
+  },
+  {
+    "id": "tabua-costela",
+    "categoryId": "tabuas",
+    "name": "Tábua Costela",
+    "price": 89.9,
+    "available": true
+  },
+  {
+    "id": "tabua-crispy-catupiry",
+    "categoryId": "tabuas",
+    "name": "Tábua Crispy Catupiry",
+    "price": 96.9,
+    "available": true
+  },
+  {
+    "id": "tabua-dogao-linguica",
+    "categoryId": "tabuas",
+    "name": "Tábua Dogão Linguiça",
+    "price": 70.9,
+    "available": true
+  },
+  {
+    "id": "tabua-dogao-salsicha",
+    "categoryId": "tabuas",
+    "name": "Tábua Dogão Salsicha",
+    "price": 70.9,
+    "available": true
+  },
+  {
+    "id": "tabua-duplo",
+    "categoryId": "tabuas",
+    "name": "Tábua Duplo",
+    "price": 96.9,
+    "available": true
+  },
+  {
+    "id": "tabua-duplo-smash",
+    "categoryId": "tabuas",
+    "name": "Tábua Duplo Smash",
+    "price": 90.9,
+    "available": true
+  },
+  {
+    "id": "tabua-epico",
+    "categoryId": "tabuas",
+    "name": "Tábua Épico",
+    "price": 91.9,
+    "available": true
+  },
+  {
+    "id": "tabua-explosao-cheddar",
+    "categoryId": "tabuas",
+    "name": "Tábua Explosão de Cheddar",
+    "price": 92.9,
+    "available": true
+  },
+  {
+    "id": "tabua-familia",
+    "categoryId": "tabuas",
+    "name": "Tábua Família",
+    "price": 104.9,
+    "available": true
+  },
+  {
+    "id": "tabua-gourmet",
+    "categoryId": "tabuas",
+    "name": "Tábua Gourmet",
+    "price": 83.9,
+    "available": true
+  },
+  {
+    "id": "tabua-majestoso",
+    "categoryId": "tabuas",
+    "name": "Tábua Majestoso",
+    "price": 97.9,
+    "available": true
+  },
+  {
+    "id": "tabua-triplo-smash",
+    "categoryId": "tabuas",
+    "name": "Tábua Triplo Smash",
+    "price": 94.9,
+    "available": true
+  },
+  {
+    "id": "tabua-vegano",
+    "categoryId": "tabuas",
+    "name": "Tábua Vegano",
+    "price": 92.9,
+    "available": true
+  },
+  {
+    "id": "frango-empanado-grande",
+    "categoryId": "porcoes",
+    "name": "Frango Empanado Frito (Grande)",
+    "price": 63.9,
+    "available": true
+  },
+  {
+    "id": "frango-empanado-media",
+    "categoryId": "porcoes",
+    "name": "Frango Empanado Frito (Média)",
+    "price": 45.9,
+    "available": true
+  },
+  {
+    "id": "fritas-grande",
+    "categoryId": "porcoes",
+    "name": "Fritas Grande",
+    "price": 29.9,
+    "available": true
+  },
+  {
+    "id": "fritas-media",
+    "categoryId": "porcoes",
+    "name": "Fritas Média",
+    "price": 19.9,
+    "available": true
+  },
+  {
+    "id": "fritas-pequena",
+    "categoryId": "porcoes",
+    "name": "Fritas Pequena",
+    "price": 9.9,
+    "available": true
+  },
+  {
+    "id": "risole-queijo-gouda",
+    "categoryId": "porcoes",
+    "name": "Porção de Risole de Queijo Gouda",
+    "price": 26.9,
+    "available": true
+  },
+  {
+    "id": "coxinhas",
+    "categoryId": "porcoes",
+    "name": "Porção de Coxinhas",
+    "price": 21.9,
+    "available": true
+  },
+  {
+    "id": "nugget-supreme",
+    "categoryId": "porcoes",
+    "name": "Porção de Nugget Supreme",
+    "price": 21.9,
+    "available": true
+  },
+  {
+    "id": "frango-passarinho",
+    "categoryId": "porcoes",
+    "name": "Porção Frango a Passarinho",
+    "price": 35.9,
+    "available": true
+  },
+  {
+    "id": "roda-gigante",
+    "categoryId": "porcoes",
+    "name": "Roda Gigante de Petiscos",
+    "price": 64.9,
+    "available": true
+  },
+  {
+    "id": "brownie-sorvete",
+    "categoryId": "sobremesas",
+    "name": "Brownie com Sorvete",
+    "price": 28.9,
+    "available": true
+  },
+  {
+    "id": "matilda-cake",
+    "categoryId": "sobremesas",
+    "name": "Matilda Cake",
+    "price": 24.9,
+    "available": true
+  },
+  {
+    "id": "molho-barbecue",
+    "categoryId": "molhos",
+    "name": "Molho Barbecue",
+    "price": 3.9,
+    "available": true
+  },
+  {
+    "id": "molho-alho",
+    "categoryId": "molhos",
+    "name": "Molho de Alho",
+    "price": 3.9,
+    "available": true
+  },
+  {
+    "id": "molho-bacon",
+    "categoryId": "molhos",
+    "name": "Molho de Bacon",
+    "price": 3.9,
+    "available": true
+  },
+  {
+    "id": "agua-com-gas",
+    "categoryId": "bebidas",
+    "name": "Água com gás",
+    "price": 4.9,
+    "available": true
+  },
+  {
+    "id": "agua-tonica-lata",
+    "categoryId": "bebidas",
+    "name": "Água Tônica Lata",
+    "price": 7.9,
+    "available": true
+  },
+  {
+    "id": "coca-cola-2l",
+    "categoryId": "bebidas",
+    "name": "Coca-Cola 2L",
+    "price": 13.9,
+    "available": true
+  },
+  {
+    "id": "coca-cola-600ml",
+    "categoryId": "bebidas",
+    "name": "Coca-Cola 600ml",
+    "price": 8.9,
+    "available": true
+  },
+  {
+    "id": "coca-cola-lata",
+    "categoryId": "bebidas",
+    "name": "Coca-Cola Lata",
+    "price": 7.9,
+    "available": true
+  },
+  {
+    "id": "coca-cola-zero-2l",
+    "categoryId": "bebidas",
+    "name": "Coca-Cola Zero 2L",
+    "price": 13.9,
+    "available": true
+  },
+  {
+    "id": "coca-cola-zero-600ml",
+    "categoryId": "bebidas",
+    "name": "Coca-Cola Zero 600ml",
+    "price": 8.9,
+    "available": true
+  },
+  {
+    "id": "coca-cola-zero-lata",
+    "categoryId": "bebidas",
+    "name": "Coca-Cola Zero Lata",
+    "price": 7.9,
+    "available": true
+  },
+  {
+    "id": "corona-330ml",
+    "categoryId": "bebidas",
+    "name": "Corona 330ml",
+    "price": 9.9,
+    "available": true
+  },
+  {
+    "id": "red-bull-250ml",
+    "categoryId": "bebidas",
+    "name": "Energético Red Bull 250ml",
+    "price": 12.9,
+    "available": true
+  },
+  {
+    "id": "fanta-laranja-lata",
+    "categoryId": "bebidas",
+    "name": "Fanta Laranja Lata",
+    "price": 7.9,
+    "available": true
+  },
+  {
+    "id": "guarana-antartica-600ml",
+    "categoryId": "bebidas",
+    "name": "Guaraná Antártica 600ml",
+    "price": 8.9,
+    "available": true
+  },
+  {
+    "id": "guarana-antartica-2l",
+    "categoryId": "bebidas",
+    "name": "Guaraná Antártica 2L",
+    "price": 13.9,
+    "available": true
+  },
+  {
+    "id": "guarana-antartica-lata",
+    "categoryId": "bebidas",
+    "name": "Guaraná Antártica Lata",
+    "price": 7.9,
+    "available": true
+  },
+  {
+    "id": "guarana-antartica-zero-lata",
+    "categoryId": "bebidas",
+    "name": "Guaraná Antártica Zero Lata",
+    "price": 7.9,
+    "available": true
+  },
+  {
+    "id": "guaravita-300ml",
+    "categoryId": "bebidas",
+    "name": "Guaravita 300ml",
+    "price": 3.9,
+    "available": true
+  },
+  {
+    "id": "h2o-limao",
+    "categoryId": "bebidas",
+    "name": "H2O Limão",
+    "price": 8.9,
+    "available": true
+  },
+  {
+    "id": "h2o-limoneto",
+    "categoryId": "bebidas",
+    "name": "H2O Limoneto",
+    "price": 8.9,
+    "available": true
+  },
+  {
+    "id": "heineken-330ml",
+    "categoryId": "bebidas",
+    "name": "Heineken 330ml",
+    "price": 9.9,
+    "available": true
+  },
+  {
+    "id": "heineken-330ml-zero",
+    "categoryId": "bebidas",
+    "name": "Heineken 330ml Zero",
+    "price": 9.9,
+    "available": true
+  },
+  {
+    "id": "ice-tea-pessego-300ml",
+    "categoryId": "bebidas",
+    "name": "Ice Tea Pêssego 300ml",
+    "price": 7.9,
+    "available": true
+  },
+  {
+    "id": "matte-300ml",
+    "categoryId": "bebidas",
+    "name": "Matte 300ml",
+    "price": 7.9,
+    "available": true
+  },
+  {
+    "id": "sprite-lata",
+    "categoryId": "bebidas",
+    "name": "Sprite Lata",
+    "price": 7.9,
+    "available": true
+  },
+  {
+    "id": "esgotado-test",
+    "categoryId": "burgers",
+    "name": "Teste Esgotado",
+    "price": 10,
+    "available": false
+  }
 ]
