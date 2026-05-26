@@ -11,6 +11,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.servlet.resource.NoResourceFoundException;
 
 import java.util.List;
 
@@ -52,6 +53,13 @@ public class ApiExceptionHandler {
     public ResponseEntity<ApiError> handleInvalidTransition(InvalidStatusTransitionException ex, HttpServletRequest req) {
         return problem(HttpStatus.CONFLICT,
             ApiError.of("invalid-status-transition", "Transição inválida", 409, ex.getMessage(), req.getRequestURI()));
+    }
+
+    @ExceptionHandler(NoResourceFoundException.class)
+    public ResponseEntity<ApiError> handleNoResource(NoResourceFoundException ex, HttpServletRequest req) {
+        return problem(HttpStatus.NOT_FOUND,
+            ApiError.of("not-found", "Rota não encontrada", 404,
+                "Recurso não encontrado: " + req.getRequestURI(), req.getRequestURI()));
     }
 
     @ExceptionHandler(Exception.class)
