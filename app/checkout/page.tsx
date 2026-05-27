@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useCartStore } from '@/lib/cart-store';
 import { calcDiscount, calcSubtotal } from '@/lib/cart';
@@ -79,8 +79,13 @@ export default function CheckoutPage() {
   const estimateMinutes = estimateTotalMinutes(method, storeConfig.averagePrepTime, fee);
   const estimatedRange = rangeFor(estimateMinutes);
 
+  useEffect(() => {
+    if (items.length === 0 && step !== 'sent') {
+      router.replace('/');
+    }
+  }, [items.length, step, router]);
+
   if (items.length === 0 && step !== 'sent') {
-    router.replace('/');
     return null;
   }
 
