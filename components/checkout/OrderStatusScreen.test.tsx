@@ -1,10 +1,13 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { render, screen, within } from '@testing-library/react';
+import { render, screen, within, act, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { OrderStatusScreen } from './OrderStatusScreen';
+import * as api from '@/lib/api-client';
+import type { OrderResponse } from '@/lib/types-api';
 import type { Address, Customer } from '@/lib/types';
 
 let openSpy: ReturnType<typeof vi.spyOn>;
+let getOrderSpy: ReturnType<typeof vi.spyOn>;
 
 const customer: Customer = { name: 'João Silva', phone: '(21) 99999-0000' };
 
@@ -16,16 +19,46 @@ const address: Address = {
   complement: 'apto 302',
 };
 
+function makeOrder(overrides: Partial<OrderResponse> = {}): OrderResponse {
+  return {
+    id: 'ord_01HZ',
+    displayId: '#3417',
+    status: 'RECEIVED',
+    fulfillmentType: 'DELIVERY',
+    customer,
+    address,
+    payment: 'PIX',
+    items: [],
+    totals: { subtotal: 30, discount: 0, deliveryFee: 5, total: 35 },
+    estimatedMinutes: { min: 30, max: 50 },
+    createdAt: '2026-05-21T18:00:00Z',
+    timestamps: {
+      receivedAt: '2026-05-21T18:00:00Z',
+      preparingAt: null,
+      outAt: null,
+      deliveredAt: null,
+      cancelledAt: null,
+    },
+    ...overrides,
+  };
+}
+
 beforeEach(() => {
   openSpy = vi.spyOn(window, 'open').mockImplementation(() => null);
   openSpy.mockClear();
+  getOrderSpy = vi.spyOn(api, 'getOrder').mockResolvedValue(makeOrder());
+});
+
+afterEach(() => {
+  vi.useRealTimers();
+  vi.restoreAllMocks();
 });
 
 function renderDelivery() {
   return render(
     <OrderStatusScreen
-      orderId="#3417"
-      estimatedMinutes={{ min: 30, max: 50 }}
+      orderId="ord_01HZ"
+      initialEstimatedMinutes={{ min: 30, max: 50 }}
       method="delivery"
       customer={customer}
       address={address}
@@ -36,8 +69,8 @@ function renderDelivery() {
 function renderPickup() {
   return render(
     <OrderStatusScreen
-      orderId="#3417"
-      estimatedMinutes={{ min: 25, max: 25 }}
+      orderId="ord_01HZ"
+      initialEstimatedMinutes={{ min: 25, max: 25 }}
       method="pickup"
       customer={customer}
     />,
@@ -45,10 +78,12 @@ function renderPickup() {
 }
 
 describe('OrderStatusScreen — layout', () => {
-  it('mostra o título "Acompanhe seu pedido" e o número do pedido', () => {
+  it('mostra o título "Acompanhe seu pedido" e o número do pedido', async () => {
     renderDelivery();
     expect(screen.getByText(/acompanhe seu pedido/i)).toBeInTheDocument();
-    expect(screen.getAllByText(/#3417/).length).toBeGreaterThan(0);
+    await waitFor(() =>
+      expect(screen.getAllByText(/#3417/).length).toBeGreaterThan(0),
+    );
   });
 
   it('mostra a janela de previsão de entrega em HH:MM', () => {
@@ -68,17 +103,19 @@ describe('OrderStatusScreen — layout', () => {
     expect(clockText).toBeInTheDocument();
   });
 
-  it('mostra as 4 etapas da timeline com apenas "Recebido" ativa', () => {
+  it('mostra as 4 etapas da timeline com apenas "Recebido" ativa', async () => {
     renderDelivery();
-    const timeline = screen.getByRole('list');
-    const items = within(timeline).getAllByRole('listitem');
-    expect(items).toHaveLength(4);
-    expect(within(items[0]).getByText('Recebido')).toBeInTheDocument();
-    expect(within(items[1]).getByText('Em preparo')).toBeInTheDocument();
-    expect(within(items[2]).getByText('Saiu')).toBeInTheDocument();
-    expect(within(items[3]).getByText('Entregue')).toBeInTheDocument();
-    expect(items[0]).toHaveAttribute('aria-current', 'step');
-    expect(items[1]).not.toHaveAttribute('aria-current');
+    await waitFor(() => {
+      const timeline = screen.getByRole('list');
+      const items = within(timeline).getAllByRole('listitem');
+      expect(items).toHaveLength(4);
+      expect(within(items[0]).getByText('Recebido')).toBeInTheDocument();
+      expect(within(items[1]).getByText('Em preparo')).toBeInTheDocument();
+      expect(within(items[2]).getByText('Saiu')).toBeInTheDocument();
+      expect(within(items[3]).getByText('Entregue')).toBeInTheDocument();
+      expect(items[0]).toHaveAttribute('aria-current', 'step');
+      expect(items[1]).not.toHaveAttribute('aria-current');
+    });
   });
 
   it('mostra dados do cliente', () => {
@@ -103,12 +140,9 @@ describe('OrderStatusScreen — layout', () => {
 });
 
 describe('OrderStatusScreen — ações', () => {
-  afterEach(() => {
-    vi.useRealTimers();
-  });
-
   it('CTA "Abrir conversa no WhatsApp" abre o WhatsApp com a mensagem de contato', async () => {
     renderDelivery();
+    await waitFor(() => expect(getOrderSpy).toHaveBeenCalled());
     await userEvent.click(
       screen.getByRole('button', { name: /abrir conversa no whatsapp/i }),
     );
@@ -120,6 +154,7 @@ describe('OrderStatusScreen — ações', () => {
 
   it('botão "Cancelar pedido" abre o WhatsApp com a mensagem de cancelamento', async () => {
     renderDelivery();
+    await waitFor(() => expect(getOrderSpy).toHaveBeenCalled());
     await userEvent.click(screen.getByRole('button', { name: /cancelar pedido/i }));
     const url = openSpy.mock.calls[0][0] as string;
     expect(decodeURIComponent(url)).toContain('cancelar o pedido #3417');
@@ -127,6 +162,7 @@ describe('OrderStatusScreen — ações', () => {
 
   it('link "Ajuda" abre o WhatsApp com a mensagem de ajuda', async () => {
     renderDelivery();
+    await waitFor(() => expect(getOrderSpy).toHaveBeenCalled());
     await userEvent.click(screen.getByRole('button', { name: /ajuda/i }));
     const url = openSpy.mock.calls[0][0] as string;
     expect(decodeURIComponent(url)).toContain('preciso de ajuda com o pedido #3417');
@@ -136,5 +172,86 @@ describe('OrderStatusScreen — ações', () => {
     renderDelivery();
     const back = screen.getByRole('link', { name: /voltar ao cardápio/i });
     expect(back).toHaveAttribute('href', '/');
+  });
+});
+
+describe('OrderStatusScreen — polling', () => {
+  it('faz uma chamada imediata a api.getOrder no mount', async () => {
+    renderDelivery();
+    await waitFor(() => expect(getOrderSpy).toHaveBeenCalledTimes(1));
+    expect(getOrderSpy).toHaveBeenCalledWith('ord_01HZ');
+  });
+
+  it('faz nova chamada a cada 10s', async () => {
+    vi.useFakeTimers();
+    renderDelivery();
+    await vi.waitFor(() => expect(getOrderSpy).toHaveBeenCalledTimes(1));
+
+    await act(async () => {
+      await vi.advanceTimersByTimeAsync(10_000);
+    });
+    expect(getOrderSpy).toHaveBeenCalledTimes(2);
+
+    await act(async () => {
+      await vi.advanceTimersByTimeAsync(10_000);
+    });
+    expect(getOrderSpy).toHaveBeenCalledTimes(3);
+  });
+
+  it('quando status="PREPARING", item 1 da timeline tem aria-current="step" e item 0 não', async () => {
+    getOrderSpy.mockResolvedValue(makeOrder({ status: 'PREPARING' }));
+    renderDelivery();
+
+    await waitFor(() => {
+      const items = within(screen.getByRole('list')).getAllByRole('listitem');
+      expect(items[1]).toHaveAttribute('aria-current', 'step');
+      expect(items[0]).not.toHaveAttribute('aria-current');
+    });
+  });
+
+  it('quando status="CANCELLED", esconde a timeline e mostra "Pedido cancelado pela loja"', async () => {
+    getOrderSpy.mockResolvedValue(makeOrder({ status: 'CANCELLED' }));
+    renderDelivery();
+
+    await waitFor(() => {
+      expect(screen.getByText(/pedido cancelado pela loja/i)).toBeInTheDocument();
+    });
+    expect(screen.queryByRole('list')).not.toBeInTheDocument();
+  });
+
+  it('falha de tick é silenciosa — não rompe a UI, próximo tick tenta de novo', async () => {
+    vi.useFakeTimers();
+    getOrderSpy
+      .mockResolvedValueOnce(makeOrder({ status: 'RECEIVED' }))
+      .mockRejectedValueOnce(new Error('boom'))
+      .mockResolvedValueOnce(makeOrder({ status: 'PREPARING' }));
+
+    renderDelivery();
+    await vi.waitFor(() => expect(getOrderSpy).toHaveBeenCalledTimes(1));
+
+    await act(async () => {
+      await vi.advanceTimersByTimeAsync(10_000);
+    });
+    expect(getOrderSpy).toHaveBeenCalledTimes(2);
+
+    await act(async () => {
+      await vi.advanceTimersByTimeAsync(10_000);
+    });
+    await vi.waitFor(() => {
+      const items = within(screen.getByRole('list')).getAllByRole('listitem');
+      expect(items[1]).toHaveAttribute('aria-current', 'step');
+    });
+  });
+
+  it('unmount limpa o interval (não chama mais getOrder após desmontar)', async () => {
+    vi.useFakeTimers();
+    const { unmount } = renderDelivery();
+    await vi.waitFor(() => expect(getOrderSpy).toHaveBeenCalledTimes(1));
+
+    unmount();
+    await act(async () => {
+      await vi.advanceTimersByTimeAsync(30_000);
+    });
+    expect(getOrderSpy).toHaveBeenCalledTimes(1);
   });
 });

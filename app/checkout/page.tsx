@@ -1,13 +1,14 @@
 'use client';
 
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useCartStore } from '@/lib/cart-store';
 import { calcDiscount, calcSubtotal } from '@/lib/cart';
 import { isOpen } from '@/lib/store-status';
 import { estimateTotalMinutes } from '@/lib/delivery-time';
-import { generateOrderId } from '@/lib/order-id';
 import { buildWhatsAppMessage } from '@/lib/order-message';
+import * as api from '@/lib/api-client';
+import { ApiError } from '@/lib/api-client';
 import { storeConfig } from '@/config/store';
 import { categories } from '@/data/menu';
 import { deliveryAreas } from '@/data/delivery';
@@ -23,6 +24,31 @@ type Step = 'identification' | 'delivery' | 'payment' | 'review' | 'sent';
 
 const rangeFor = (m: number) => ({ min: m - 5, max: m + 5 });
 
+function humanize(err: ApiError): string {
+  switch (err.type) {
+    case 'store-closed':
+      return 'A loja está fechada agora. Confira os horários.';
+    case 'product-not-found':
+    case 'product-unavailable':
+      return 'Um produto do seu carrinho saiu do cardápio. Atualize e tente de novo.';
+    case 'delivery-area-not-served':
+      return 'Não entregamos no bairro selecionado.';
+    case 'order-min-not-met':
+      return 'Pedido abaixo do mínimo de R$ 25,00.';
+    case 'change-insufficient':
+      return 'O troco precisa cobrir o total.';
+    case 'coupon-invalid':
+    case 'coupon-min-not-met':
+      return 'Cupom inválido ou não aplicável.';
+    case 'validation-failed':
+      return 'Preencha todos os campos obrigatórios.';
+    case 'network-error':
+      return 'Sem conexão com o servidor. Tente de novo em alguns instantes.';
+    default:
+      return err.detail || 'Erro ao enviar pedido.';
+  }
+}
+
 export default function CheckoutPage() {
   const router = useRouter();
   const items = useCartStore((s) => s.items);
@@ -37,6 +63,7 @@ export default function CheckoutPage() {
   const [orderId, setOrderId] = useState<string | null>(null);
   const [sentEstimate, setSentEstimate] = useState<{ min: number; max: number } | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [submitting, setSubmitting] = useState(false);
 
   const subtotal = useMemo(() => calcSubtotal(items), [items]);
   const discount = useMemo(() => calcDiscount(subtotal, coupon), [subtotal, coupon]);
@@ -52,8 +79,13 @@ export default function CheckoutPage() {
   const estimateMinutes = estimateTotalMinutes(method, storeConfig.averagePrepTime, fee);
   const estimatedRange = rangeFor(estimateMinutes);
 
+  useEffect(() => {
+    if (items.length === 0 && step !== 'sent') {
+      router.replace('/');
+    }
+  }, [items.length, step, router]);
+
   if (items.length === 0 && step !== 'sent') {
-    router.replace('/');
     return null;
   }
 
@@ -61,7 +93,7 @@ export default function CheckoutPage() {
     return (
       <OrderStatusScreen
         orderId={orderId}
-        estimatedMinutes={sentEstimate}
+        initialEstimatedMinutes={sentEstimate}
         method={method}
         customer={customer}
         address={method === 'delivery' && address ? address : undefined}
@@ -69,7 +101,8 @@ export default function CheckoutPage() {
     );
   }
 
-  const submit = () => {
+  const submit = async () => {
+    if (submitting) return;
     setErrorMessage(null);
 
     if (!isOpen(new Date(), storeConfig.openingHours)) {
@@ -91,32 +124,56 @@ export default function CheckoutPage() {
       return;
     }
 
-    const id = generateOrderId();
-    const msg = buildWhatsAppMessage({
-      orderId: id,
-      customer,
-      items,
-      categories,
-      coupon,
-      subtotal,
-      discount,
-      deliveryFee: fee,
-      total,
-      estimatedMinutes: estimatedRange,
-      method,
-      address: method === 'delivery' ? address! : undefined,
-      payment,
-      changeFor: payment === 'cash' ? changeFor : undefined,
-      storeBusinessName: storeConfig.whatsappBusinessName,
-      storeAddress: storeConfig.address,
-    });
+    setSubmitting(true);
+    try {
+      const order = await api.createOrder({
+        customer,
+        fulfillmentType: method === 'delivery' ? 'DELIVERY' : 'PICKUP',
+        address: method === 'delivery' && address ? address : undefined,
+        payment: payment.toUpperCase() as 'PIX' | 'CASH' | 'CREDIT' | 'DEBIT',
+        changeFor: payment === 'cash' ? changeFor : undefined,
+        items: items.map((i) => ({
+          productId: i.product.id,
+          quantity: i.quantity,
+          notes: i.notes.trim() ? i.notes.trim() : undefined,
+        })),
+        couponCode: coupon?.code,
+      });
 
-    const url = `https://wa.me/${storeConfig.whatsappNumber}?text=${encodeURIComponent(msg)}`;
-    window.open(url, '_blank');
+      const msg = buildWhatsAppMessage({
+        orderId: order.displayId,
+        customer,
+        items,
+        categories,
+        coupon,
+        subtotal: order.totals.subtotal,
+        discount: order.totals.discount,
+        deliveryFee: order.totals.deliveryFee,
+        total: order.totals.total,
+        estimatedMinutes: order.estimatedMinutes,
+        method,
+        address: method === 'delivery' ? address! : undefined,
+        payment,
+        changeFor: payment === 'cash' ? changeFor : undefined,
+        storeBusinessName: storeConfig.whatsappBusinessName,
+        storeAddress: storeConfig.address,
+      });
 
-    setOrderId(id);
-    setSentEstimate(estimatedRange);
-    setStep('sent');
+      const url = `https://wa.me/${storeConfig.whatsappNumber}?text=${encodeURIComponent(msg)}`;
+      window.open(url, '_blank');
+
+      setOrderId(order.id);
+      setSentEstimate(order.estimatedMinutes);
+      setStep('sent');
+    } catch (e) {
+      if (e instanceof ApiError) {
+        setErrorMessage(humanize(e));
+      } else {
+        setErrorMessage('Erro ao enviar pedido.');
+      }
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   return (

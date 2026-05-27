@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { useMemo } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useCartStore } from '@/lib/cart-store';
 import { buildCancelMessage } from '@/lib/order-cancel-message';
 import {
@@ -9,12 +9,14 @@ import {
   buildHelpMessage,
 } from '@/lib/order-message';
 import { estimateClock } from '@/lib/order-time';
+import * as api from '@/lib/api-client';
 import { storeConfig } from '@/config/store';
+import type { OrderResponse, OrderStatus } from '@/lib/types-api';
 import type { Address, Customer, DeliveryMethod } from '@/lib/types';
 
 interface Props {
   orderId: string;
-  estimatedMinutes: { min: number; max: number };
+  initialEstimatedMinutes: { min: number; max: number };
   method: DeliveryMethod;
   customer: Customer;
   address?: Address;
@@ -27,7 +29,14 @@ const STEPS = [
   { key: 'delivered', label: 'Entregue' },
 ] as const;
 
-const ACTIVE_INDEX = 0;
+const STATUS_TO_INDEX: Record<Exclude<OrderStatus, 'CANCELLED'>, number> = {
+  RECEIVED: 0,
+  PREPARING: 1,
+  OUT: 2,
+  DELIVERED: 3,
+};
+
+const POLL_MS = 10_000;
 
 function openWhatsApp(text: string) {
   const url = `https://wa.me/${storeConfig.whatsappNumber}?text=${encodeURIComponent(text)}`;
@@ -36,17 +45,87 @@ function openWhatsApp(text: string) {
 
 export function OrderStatusScreen({
   orderId,
-  estimatedMinutes,
+  initialEstimatedMinutes,
   method,
   customer,
   address,
 }: Props) {
   const clear = useCartStore((s) => s.clear);
+  const [order, setOrder] = useState<OrderResponse | null>(null);
+
+  useEffect(() => {
+    let mounted = true;
+    const tick = async () => {
+      try {
+        const updated = await api.getOrder(orderId);
+        if (mounted) setOrder(updated);
+      } catch {
+        // tick silencioso: próximo tick tenta de novo.
+      }
+    };
+    tick();
+    const id = setInterval(tick, POLL_MS);
+    return () => {
+      mounted = false;
+      clearInterval(id);
+    };
+  }, [orderId]);
+
+  const displayId = order?.displayId ?? orderId;
+  const status: OrderStatus = order?.status ?? 'RECEIVED';
+  const estimatedMinutes = order?.estimatedMinutes ?? initialEstimatedMinutes;
   const clock = useMemo(
     () => estimateClock(new Date(), estimatedMinutes),
     [estimatedMinutes],
   );
-  const progressPct = ((ACTIVE_INDEX + 1) / STEPS.length) * 100;
+
+  if (status === 'CANCELLED') {
+    return (
+      <main className="mx-auto max-w-2xl px-6 py-12 text-paper">
+        <header className="flex items-center justify-between border-b border-line pb-4">
+          <Link
+            href="/"
+            aria-label="Início"
+            className="text-paper hover:text-white"
+          >
+            ←
+          </Link>
+          <h1 className="text-xs uppercase tracking-widest text-faint">
+            Acompanhe seu pedido
+          </h1>
+          <span aria-hidden="true" className="w-4" />
+        </header>
+
+        <section className="mt-10 rounded border border-line bg-surface p-8 text-center">
+          <p className="font-heading text-2xl font-extrabold text-paper">
+            Pedido cancelado pela loja
+          </p>
+          <p className="mt-2 text-sm text-faint">
+            Entre em contato com a loja se precisar de mais informações.
+          </p>
+          <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:justify-center">
+            <button
+              type="button"
+              onClick={() => openWhatsApp(buildContactMessage(displayId))}
+              className="cursor-pointer rounded bg-paper px-4 py-3 font-semibold text-ink hover:bg-white"
+            >
+              Falar com a loja
+            </button>
+            <Link
+              href="/"
+              onClick={() => clear()}
+              className="cursor-pointer rounded border border-line px-4 py-3 text-center text-sm hover:border-paper"
+            >
+              Voltar ao cardápio
+            </Link>
+          </div>
+        </section>
+      </main>
+    );
+  }
+
+  const activeIndex = STATUS_TO_INDEX[status];
+  const progressPct = ((activeIndex + 1) / STEPS.length) * 100;
 
   return (
     <main className="mx-auto max-w-2xl px-6 py-12 text-paper">
@@ -63,7 +142,7 @@ export function OrderStatusScreen({
         </h1>
         <button
           type="button"
-          onClick={() => openWhatsApp(buildHelpMessage(orderId))}
+          onClick={() => openWhatsApp(buildHelpMessage(displayId))}
           className="cursor-pointer text-sm text-paper underline-offset-4 hover:underline"
         >
           Ajuda
@@ -80,13 +159,13 @@ export function OrderStatusScreen({
           <p className="text-xs uppercase tracking-widest text-faint">
             Previsão de entrega
           </p>
-          <p className="text-xs text-faint">Pedido {orderId}</p>
+          <p className="text-xs text-faint">Pedido {displayId}</p>
         </div>
         <p className="mt-1 font-heading text-4xl font-extrabold text-paper">
           {clock.start} – {clock.end}
         </p>
         <span className="sr-only">
-          Pedido recebido. Previsão de entrega entre {clock.start} e {clock.end}.
+          Status atual: {STEPS[activeIndex].label}. Previsão de entrega entre {clock.start} e {clock.end}.
         </span>
 
         <div className="mt-6 h-1 rounded bg-line">
@@ -98,7 +177,7 @@ export function OrderStatusScreen({
 
         <ol className="mt-3 grid grid-cols-4 gap-2 text-center">
           {STEPS.map((step, i) => {
-            const active = i === ACTIVE_INDEX;
+            const active = i === activeIndex;
             return (
               <li
                 key={step.key}
@@ -126,9 +205,17 @@ export function OrderStatusScreen({
           className="mt-2 h-2 w-2 shrink-0 rounded-full bg-paper"
         />
         <p className="text-sm text-paper">
-          Pedido recebido —{' '}
+          {STEPS[activeIndex].label} —{' '}
           <span className="text-muted">
-            aguardando confirmação da loja no WhatsApp.
+            {status === 'RECEIVED'
+              ? 'aguardando confirmação da loja no WhatsApp.'
+              : status === 'PREPARING'
+                ? 'sua comida já está sendo preparada.'
+                : status === 'OUT'
+                  ? method === 'delivery'
+                    ? 'o entregador está a caminho.'
+                    : 'seu pedido está pronto para retirada.'
+                  : 'pedido entregue. Obrigado!'}
           </span>
         </p>
       </section>
@@ -144,11 +231,11 @@ export function OrderStatusScreen({
           </div>
           <div className="flex-1">
             <p className="font-semibold text-paper">{storeConfig.brandName}</p>
-            <p className="text-xs text-faint">N° do pedido {orderId}</p>
+            <p className="text-xs text-faint">N° do pedido {displayId}</p>
           </div>
           <button
             type="button"
-            onClick={() => openWhatsApp(buildContactMessage(orderId))}
+            onClick={() => openWhatsApp(buildContactMessage(displayId))}
             className="cursor-pointer text-sm text-paper underline-offset-4 hover:underline"
           >
             Ligar
@@ -190,7 +277,7 @@ export function OrderStatusScreen({
       <section className="mt-6 space-y-3">
         <button
           type="button"
-          onClick={() => openWhatsApp(buildContactMessage(orderId))}
+          onClick={() => openWhatsApp(buildContactMessage(displayId))}
           className="w-full cursor-pointer rounded bg-paper px-4 py-3 font-semibold text-ink transition-colors hover:bg-white"
         >
           Abrir conversa no WhatsApp
@@ -199,7 +286,7 @@ export function OrderStatusScreen({
         <div className="grid grid-cols-2 gap-3">
           <button
             type="button"
-            onClick={() => openWhatsApp(buildCancelMessage(orderId))}
+            onClick={() => openWhatsApp(buildCancelMessage(displayId))}
             className="cursor-pointer rounded border border-line px-4 py-2 text-sm hover:border-paper"
           >
             Cancelar pedido
