@@ -26,10 +26,19 @@ public class RateLimitFilter extends OncePerRequestFilter {
     };
 
     private final Map<String, Bucket> buckets = new ConcurrentHashMap<>();
+    private final boolean enabled;
+
+    public RateLimitFilter(boolean enabled) {
+        this.enabled = enabled;
+    }
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
             throws ServletException, IOException {
+        if (!enabled) {
+            chain.doFilter(request, response);
+            return;
+        }
         Rule rule = matchRule(request);
         if (rule == null) {
             chain.doFilter(request, response);

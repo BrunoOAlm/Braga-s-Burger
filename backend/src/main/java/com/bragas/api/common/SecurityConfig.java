@@ -27,12 +27,14 @@ public class SecurityConfig {
     private final List<String> corsOrigins;
     private final JwtService jwtService;
     private final UserRepository userRepository;
+    private final boolean rateLimitEnabled;
 
     public SecurityConfig(AppProperties props, JwtService jwtService, UserRepository userRepository) {
         this.adminToken = props.admin() == null ? null : props.admin().token();
         this.corsOrigins = props.cors() == null ? null : props.cors().allowedOrigins();
         this.jwtService = jwtService;
         this.userRepository = userRepository;
+        this.rateLimitEnabled = props.auth().rateLimitEnabled();
     }
 
     @Bean
@@ -49,7 +51,7 @@ public class SecurityConfig {
                 .anyRequest().permitAll()
             )
             .exceptionHandling(e -> e.authenticationEntryPoint(new ProblemDetailsAuthEntryPoint()))
-            .addFilterBefore(new RateLimitFilter(), UsernamePasswordAuthenticationFilter.class)
+            .addFilterBefore(new RateLimitFilter(rateLimitEnabled), UsernamePasswordAuthenticationFilter.class)
             .addFilterBefore(new JwtCookieAuthFilter(jwtService, userRepository), UsernamePasswordAuthenticationFilter.class)
             .addFilterBefore(new AdminTokenFilter(adminToken), AuthorizationFilter.class);
         return http.build();

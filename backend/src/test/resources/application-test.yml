@@ -31,6 +31,7 @@ app:
     cookieSecure: false
     cookieSameSite: Lax
     jwtTtlSeconds: 3600
+    rateLimitEnabled: false
   mail:
     from: test@bragas.local
     resetBaseUrl: http://localhost:3000/redefinir-senha

@@ -41,7 +41,9 @@ class MeControllerIT {
     }
 
     @Autowired MockMvc mvc;
-    @Autowired ObjectMapper om;
+    // Spring Boot 4 autoconfig usa Jackson 3 (tools.jackson) — Jackson 2 ObjectMapper
+    // não é mais bean automático. Instanciamos localmente para serializar DTOs nos testes.
+    private final ObjectMapper om = new ObjectMapper();
     @Autowired UserRepository userRepo;
 
     @BeforeEach
@@ -93,7 +95,7 @@ class MeControllerIT {
     }
 
     private Cookie signupAndExtractCookie(String email) throws Exception {
-        var req = new SignupRequest(email, "senha12345", "U", "(21) 99999-0000");
+        var req = new SignupRequest(email, "senha12345", "Usuario", "(21) 99999-0000");
         MvcResult r = mvc.perform(post("/api/v1/auth/signup")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(om.writeValueAsString(req)))

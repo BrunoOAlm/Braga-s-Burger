@@ -13,7 +13,7 @@ class RateLimitFilterTest {
 
     @Test
     void allows_up_to_limit_then_blocks() throws Exception {
-        var filter = new RateLimitFilter();
+        var filter = new RateLimitFilter(true);
         var chain = mock(FilterChain.class);
 
         for (int i = 0; i < 5; i++) {
@@ -34,7 +34,7 @@ class RateLimitFilterTest {
 
     @Test
     void different_ips_have_independent_buckets() throws Exception {
-        var filter = new RateLimitFilter();
+        var filter = new RateLimitFilter(true);
         var chain = mock(FilterChain.class);
 
         for (int i = 0; i < 5; i++) {
@@ -48,7 +48,7 @@ class RateLimitFilterTest {
 
     @Test
     void non_auth_routes_pass_unchanged() throws Exception {
-        var filter = new RateLimitFilter();
+        var filter = new RateLimitFilter(true);
         var chain = mock(FilterChain.class);
         var req = new MockHttpServletRequest("POST", "/api/v1/orders");
         for (int i = 0; i < 50; i++) {

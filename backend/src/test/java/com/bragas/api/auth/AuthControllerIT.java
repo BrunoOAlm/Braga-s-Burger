@@ -40,7 +40,9 @@ class AuthControllerIT {
     }
 
     @Autowired MockMvc mvc;
-    @Autowired ObjectMapper om;
+    // Spring Boot 4 autoconfig usa Jackson 3 (tools.jackson) — Jackson 2 ObjectMapper
+    // não é mais bean automático. Instanciamos localmente para serializar DTOs nos testes.
+    private final ObjectMapper om = new ObjectMapper();
     @Autowired UserRepository userRepo;
     @Autowired PasswordResetTokenRepository tokenRepo;
     @Autowired MailService mail;
@@ -126,7 +128,7 @@ class AuthControllerIT {
 
     @Test
     void forgot_for_known_email_sends_email_and_returns_204() throws Exception {
-        var su = new SignupRequest("forg@example.com", "senha12345", "F", "(21) 99999-0000");
+        var su = new SignupRequest("forg@example.com", "senha12345", "Fo", "(21) 99999-0000");
         mvc.perform(post("/api/v1/auth/signup").contentType(MediaType.APPLICATION_JSON).content(om.writeValueAsString(su)));
 
         mvc.perform(post("/api/v1/auth/forgot")
@@ -142,7 +144,7 @@ class AuthControllerIT {
 
     @Test
     void reset_with_valid_token_succeeds_and_sets_cookie() throws Exception {
-        var su = new SignupRequest("rst@example.com", "senha12345", "R", "(21) 99999-0000");
+        var su = new SignupRequest("rst@example.com", "senha12345", "Re", "(21) 99999-0000");
         mvc.perform(post("/api/v1/auth/signup").contentType(MediaType.APPLICATION_JSON).content(om.writeValueAsString(su)));
         mvc.perform(post("/api/v1/auth/forgot")
             .contentType(MediaType.APPLICATION_JSON)

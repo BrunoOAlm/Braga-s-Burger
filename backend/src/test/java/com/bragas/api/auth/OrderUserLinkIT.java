@@ -41,7 +41,9 @@ class OrderUserLinkIT {
     }
 
     @Autowired MockMvc mvc;
-    @Autowired ObjectMapper om;
+    // Spring Boot 4 autoconfig usa Jackson 3 (tools.jackson) — Jackson 2 ObjectMapper
+    // não é mais bean automático. Instanciamos localmente para serializar DTOs nos testes.
+    private final ObjectMapper om = new ObjectMapper();
     @Autowired UserRepository userRepo;
 
     @BeforeEach
@@ -49,7 +51,7 @@ class OrderUserLinkIT {
 
     private static final String VALID_ORDER_JSON =
         "{" +
-        "\"customer\":{\"name\":\"J\",\"phone\":\"(21) 99999-0000\"}," +
+        "\"customer\":{\"name\":\"Jo\",\"phone\":\"(21) 99999-0000\"}," +
         "\"fulfillmentType\":\"DELIVERY\"," +
         "\"address\":{\"cep\":\"20000-000\",\"street\":\"R\",\"number\":\"1\",\"neighborhood\":\"Higienópolis\"}," +
         "\"payment\":\"CREDIT\"," +
@@ -88,7 +90,7 @@ class OrderUserLinkIT {
     }
 
     private Cookie signupAndExtractCookie(String email) throws Exception {
-        var req = new SignupRequest(email, "senha12345", "U", "(21) 99999-0000");
+        var req = new SignupRequest(email, "senha12345", "Usuario", "(21) 99999-0000");
         MvcResult r = mvc.perform(post("/api/v1/auth/signup")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(om.writeValueAsString(req)))
