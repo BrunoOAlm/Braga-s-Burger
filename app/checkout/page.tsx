@@ -1,8 +1,9 @@
 'use client';
 
 import { useEffect, useMemo, useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { useCartStore } from '@/lib/cart-store';
+import { useAuth } from '@/lib/auth-context';
 import { calcDiscount, calcSubtotal } from '@/lib/cart';
 import { isOpen } from '@/lib/store-status';
 import { estimateTotalMinutes } from '@/lib/delivery-time';
@@ -51,11 +52,29 @@ function humanize(err: ApiError): string {
 
 export default function CheckoutPage() {
   const router = useRouter();
+  const sp = useSearchParams();
+  const { state: authState } = useAuth();
+  const queryOrderId = sp.get('orderId');
   const items = useCartStore((s) => s.items);
   const coupon = useCartStore((s) => s.coupon);
 
   const [step, setStep] = useState<Step>('identification');
-  const [customer, setCustomer] = useState<Customer>({ name: '', phone: '' });
+  const [customer, setCustomer] = useState<Customer>(() =>
+    authState.status === 'authenticated'
+      ? { name: authState.user.name, phone: authState.user.phone }
+      : { name: '', phone: '' },
+  );
+
+  useEffect(() => {
+    if (authState.status === 'authenticated' && !customer.name) {
+      setCustomer({
+        name: authState.user.name,
+        phone: authState.user.phone,
+      });
+    }
+    // intencional: só ressincroniza quando o login resolve, não a cada mudança no customer
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [authState.status]);
   const [method, setMethod] = useState<DeliveryMethod>('delivery');
   const [address, setAddress] = useState<Address | null>(null);
   const [payment, setPayment] = useState<PaymentMethod | null>(null);
@@ -80,12 +99,21 @@ export default function CheckoutPage() {
   const estimatedRange = rangeFor(estimateMinutes);
 
   useEffect(() => {
-    if (items.length === 0 && step !== 'sent') {
+    if (items.length === 0 && step !== 'sent' && !queryOrderId) {
       router.replace('/');
     }
-  }, [items.length, step, router]);
+  }, [items.length, step, router, queryOrderId]);
 
-  if (items.length === 0 && step !== 'sent') {
+  useEffect(() => {
+    if (queryOrderId && step !== 'sent') {
+      setOrderId(queryOrderId);
+      setSentEstimate({ min: 0, max: 0 });
+      setStep('sent');
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [queryOrderId]);
+
+  if (items.length === 0 && step !== 'sent' && !queryOrderId) {
     return null;
   }
 
