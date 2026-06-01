@@ -72,7 +72,8 @@ public class ApiExceptionHandler {
     @ExceptionHandler(EmailAlreadyTakenException.class)
     public ResponseEntity<ApiError> handleEmailTaken(EmailAlreadyTakenException ex, HttpServletRequest req) {
         return problem(HttpStatus.CONFLICT,
-            ApiError.of("email-already-taken", "E-mail já cadastrado", 409, ex.getMessage(), req.getRequestURI()));
+            ApiError.of("email-already-taken", "E-mail já cadastrado", 409,
+                "E-mail já cadastrado.", req.getRequestURI()));
     }
 
     @ExceptionHandler(InvalidCredentialsException.class)
