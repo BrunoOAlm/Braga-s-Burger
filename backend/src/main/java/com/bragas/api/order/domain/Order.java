@@ -1,5 +1,6 @@
 package com.bragas.api.order.domain;
 
+import com.bragas.api.auth.domain.User;
 import com.github.f4b6a3.ulid.UlidCreator;
 import jakarta.persistence.*;
 
@@ -74,6 +75,10 @@ public class Order {
     @Column(name = "created_at", nullable = false, updatable = false) private OffsetDateTime createdAt;
     @Column(name = "updated_at", nullable = false, insertable = false, updatable = false) private OffsetDateTime updatedAt;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id")
+    private User user;
+
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
     @OrderBy("position ASC")
     private List<OrderItem> items = new ArrayList<>();
@@ -143,6 +148,7 @@ public class Order {
     public OffsetDateTime getCancelledAt() { return cancelledAt; }
     public OffsetDateTime getCreatedAt() { return createdAt; }
     public List<OrderItem> getItems() { return items; }
+    public User getUser() { return user; }
 
     public void setAddress(String cep, String street, String number, String neighborhood, String complement, String reference) {
         this.addressCep = cep;
@@ -160,4 +166,5 @@ public class Order {
     public void setTotal(BigDecimal total) { this.total = total; }
     public void setEstimatedMin(int estimatedMin) { this.estimatedMin = estimatedMin; }
     public void setEstimatedMax(int estimatedMax) { this.estimatedMax = estimatedMax; }
+    public void setUser(User user) { this.user = user; }
 }
