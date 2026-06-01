@@ -38,6 +38,7 @@ app:
     averagePrepTime: 25
     openingHours:
       sun: { open: "18:00", close: "00:00" }
+      mon: { open: "00:00", close: "23:59" }
       tue: { open: "18:00", close: "23:40" }
       wed: { open: "18:00", close: "23:40" }
       thu: { open: "18:00", close: "23:40" }
@@ -51,6 +52,7 @@ app:
   auth:
     jwtSecret: ${JWT_SECRET}
     cookieSecure: ${COOKIE_SECURE:false}
+    cookieSameSite: ${COOKIE_SAME_SITE:Lax}
     jwtTtlSeconds: 604800
   mail:
     from: ${MAIL_FROM:no-reply@bragas.local}

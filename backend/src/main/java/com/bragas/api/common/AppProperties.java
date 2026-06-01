@@ -8,6 +8,6 @@ import java.util.List;
 public record AppProperties(Admin admin, Cors cors, Auth auth, Mail mail) {
     public record Admin(String token) {}
     public record Cors(List<String> allowedOrigins) {}
-    public record Auth(String jwtSecret, boolean cookieSecure, long jwtTtlSeconds) {}
+    public record Auth(String jwtSecret, boolean cookieSecure, String cookieSameSite, long jwtTtlSeconds) {}
     public record Mail(String from, String resetBaseUrl) {}
 }

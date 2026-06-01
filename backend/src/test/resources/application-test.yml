@@ -29,6 +29,7 @@ app:
   auth:
     jwtSecret: test-secret-with-at-least-32-bytes-of-padding-yay-yay-yay
     cookieSecure: false
+    cookieSameSite: Lax
     jwtTtlSeconds: 3600
   mail:
     from: test@bragas.local
