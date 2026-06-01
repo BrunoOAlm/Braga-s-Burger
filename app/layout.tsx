@@ -4,6 +4,7 @@ import './globals.css';
 import { CartLauncher } from '@/components/cart/CartLauncher';
 import { RegisterServiceWorker } from '@/components/pwa/RegisterServiceWorker';
 import { InstallBanner } from '@/components/ui/InstallBanner';
+import { AuthProvider } from '@/lib/auth-context';
 
 const poppins = Poppins({
   subsets: ['latin'],
@@ -36,10 +37,12 @@ export default function RootLayout({
   return (
     <html lang="pt-BR" className={`${poppins.variable} ${inter.variable} antialiased`}>
       <body>
-        {children}
-        <CartLauncher />
-        <InstallBanner />
-        <RegisterServiceWorker />
+        <AuthProvider>
+          {children}
+          <CartLauncher />
+          <InstallBanner />
+          <RegisterServiceWorker />
+        </AuthProvider>
       </body>
     </html>
   );
