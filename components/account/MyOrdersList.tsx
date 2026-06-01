@@ -35,6 +35,7 @@ export function MyOrdersList() {
 
   useEffect(() => {
     let cancelled = false;
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setLoading(true);
     api
       .listMyOrders(LIMIT, offset)

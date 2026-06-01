@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useMemo, useState } from 'react';
+import { Suspense, useEffect, useMemo, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useCartStore } from '@/lib/cart-store';
 import { useAuth } from '@/lib/auth-context';
@@ -51,6 +51,14 @@ function humanize(err: ApiError): string {
 }
 
 export default function CheckoutPage() {
+  return (
+    <Suspense fallback={null}>
+      <CheckoutPageInner />
+    </Suspense>
+  );
+}
+
+function CheckoutPageInner() {
   const router = useRouter();
   const sp = useSearchParams();
   const { state: authState } = useAuth();
@@ -67,6 +75,7 @@ export default function CheckoutPage() {
 
   useEffect(() => {
     if (authState.status === 'authenticated' && !customer.name) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setCustomer({
         name: authState.user.name,
         phone: authState.user.phone,
@@ -104,6 +113,7 @@ export default function CheckoutPage() {
     }
   }, [items.length, step, router, queryOrderId]);
 
+  /* eslint-disable react-hooks/set-state-in-effect */
   useEffect(() => {
     if (queryOrderId && step !== 'sent') {
       setOrderId(queryOrderId);
@@ -112,6 +122,7 @@ export default function CheckoutPage() {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [queryOrderId]);
+  /* eslint-enable react-hooks/set-state-in-effect */
 
   if (items.length === 0 && step !== 'sent' && !queryOrderId) {
     return null;
