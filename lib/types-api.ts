@@ -68,6 +68,7 @@ export interface OrderResponse {
   totals: OrderTotals;
   estimatedMinutes: { min: number; max: number };
   createdAt: string;
+  userId?: string | null;
   timestamps: OrderTimestamps;
 }
 
@@ -78,4 +79,61 @@ export interface ProblemDetails {
   detail?: string;
   status?: number;
   instance?: string;
+}
+
+// ── SP4b: auth do cliente ─────────────────────────────────────────
+
+export interface User {
+  id: string;
+  email: string;
+  name: string;
+  phone: string;
+  createdAt: string;
+}
+
+export interface SignupRequest {
+  email: string;
+  password: string;
+  name: string;
+  phone: string;
+}
+
+export interface LoginRequest {
+  email: string;
+  password: string;
+}
+
+export interface ForgotRequest {
+  email: string;
+}
+
+export interface ResetRequest {
+  token: string;
+  newPassword: string;
+}
+
+export interface ChangePasswordRequest {
+  currentPassword: string;
+  newPassword: string;
+}
+
+export interface UpdateMeRequest {
+  name?: string;
+  phone?: string;
+}
+
+export interface OrderSummary {
+  id: string;
+  displayId: string;
+  status: OrderStatus;
+  total: number;
+  itemsCount: number;
+  createdAt: string;
+}
+
+export interface OrdersPage {
+  items: OrderSummary[];
+  total: number;
+  limit: number;
+  offset: number;
 }

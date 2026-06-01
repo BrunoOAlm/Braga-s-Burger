@@ -23,6 +23,7 @@ public record OrderResponse(
     Totals totals,
     Range estimatedMinutes,
     OffsetDateTime createdAt,
+    String userId,
     Timestamps timestamps
 ) {
     public record Customer(String name, String phone) {}
@@ -62,6 +63,7 @@ public record OrderResponse(
             new Totals(o.getSubtotal(), o.getCouponDiscount(), o.getDeliveryFee(), o.getTotal()),
             new Range(o.getEstimatedMin(), o.getEstimatedMax()),
             o.getCreatedAt(),
+            o.getUser() != null ? o.getUser().getId() : null,
             new Timestamps(o.getReceivedAt(), o.getPreparingAt(), o.getOutAt(), o.getDeliveredAt(), o.getCancelledAt())
         );
     }

@@ -1,7 +1,12 @@
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { Navbar } from './Navbar';
+
+vi.mock('next/navigation', () => ({ useRouter: () => ({ push: vi.fn() }) }));
+vi.mock('@/lib/auth-context', () => ({
+  useAuth: () => ({ state: { status: 'anonymous' }, logout: vi.fn() }),
+}));
 
 describe('Navbar', () => {
   it('exibe a logo e os links de navegação', () => {

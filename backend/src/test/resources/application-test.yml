@@ -26,3 +26,12 @@ app:
     token: test-admin-token
   cors:
     allowedOrigins: []
+  auth:
+    jwtSecret: test-secret-with-at-least-32-bytes-of-padding-yay-yay-yay
+    cookieSecure: false
+    cookieSameSite: Lax
+    jwtTtlSeconds: 3600
+    rateLimitEnabled: false
+  mail:
+    from: test@bragas.local
+    resetBaseUrl: http://localhost:3000/redefinir-senha

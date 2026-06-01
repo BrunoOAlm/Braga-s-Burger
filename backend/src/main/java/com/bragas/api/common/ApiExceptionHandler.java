@@ -1,10 +1,17 @@
 package com.bragas.api.common;
 
+import com.bragas.api.auth.EmailAlreadyTakenException;
+import com.bragas.api.auth.InvalidCredentialsException;
+import com.bragas.api.auth.RateLimitExceededException;
+import com.bragas.api.auth.ResetTokenInvalidException;
+import com.bragas.api.auth.UnauthenticatedException;
 import com.bragas.api.catalog.ProductCatalog.UnknownProductException;
 import com.bragas.api.catalog.ProductCatalog.UnavailableProductException;
 import jakarta.servlet.http.HttpServletRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -60,6 +67,54 @@ public class ApiExceptionHandler {
         return problem(HttpStatus.NOT_FOUND,
             ApiError.of("not-found", "Rota não encontrada", 404,
                 "Recurso não encontrado: " + req.getRequestURI(), req.getRequestURI()));
+    }
+
+    @ExceptionHandler(EmailAlreadyTakenException.class)
+    public ResponseEntity<ApiError> handleEmailTaken(EmailAlreadyTakenException ex, HttpServletRequest req) {
+        return problem(HttpStatus.CONFLICT,
+            ApiError.of("email-already-taken", "E-mail já cadastrado", 409,
+                "E-mail já cadastrado.", req.getRequestURI()));
+    }
+
+    @ExceptionHandler(InvalidCredentialsException.class)
+    public ResponseEntity<ApiError> handleInvalidCreds(InvalidCredentialsException ex, HttpServletRequest req) {
+        return problem(HttpStatus.UNAUTHORIZED,
+            ApiError.of("invalid-credentials", "Credenciais inválidas", 401,
+                "E-mail ou senha incorretos.", req.getRequestURI()));
+    }
+
+    @ExceptionHandler(UnauthenticatedException.class)
+    public ResponseEntity<ApiError> handleUnauth(UnauthenticatedException ex, HttpServletRequest req) {
+        return problem(HttpStatus.UNAUTHORIZED,
+            ApiError.of("unauthenticated", "Não autenticado", 401,
+                "Faça login para acessar este recurso.", req.getRequestURI()));
+    }
+
+    @ExceptionHandler(ResetTokenInvalidException.class)
+    public ResponseEntity<ApiError> handleResetInvalid(ResetTokenInvalidException ex, HttpServletRequest req) {
+        return problem(HttpStatus.UNAUTHORIZED,
+            ApiError.of("reset-token-invalid", "Link inválido", 401,
+                "Link de redefinição inválido ou expirado.", req.getRequestURI()));
+    }
+
+    @ExceptionHandler(RateLimitExceededException.class)
+    public ResponseEntity<ApiError> handleRateLimit(RateLimitExceededException ex, HttpServletRequest req) {
+        return ResponseEntity.status(HttpStatus.TOO_MANY_REQUESTS)
+            .contentType(MediaType.valueOf("application/problem+json"))
+            .header(HttpHeaders.RETRY_AFTER, String.valueOf(ex.getRetryAfterSeconds()))
+            .body(ApiError.of("too-many-requests", "Muitas requisições", 429,
+                "Aguarde alguns instantes e tente de novo.", req.getRequestURI()));
+    }
+
+    @ExceptionHandler(DataIntegrityViolationException.class)
+    public ResponseEntity<ApiError> handleDataIntegrity(DataIntegrityViolationException ex, HttpServletRequest req) {
+        String msg = ex.getMostSpecificCause().getMessage();
+        if (msg != null && msg.contains("users_email_key")) {
+            return handleEmailTaken(new EmailAlreadyTakenException("(constraint)"), req);
+        }
+        log.error("DataIntegrityViolation em {} {}: ", req.getMethod(), req.getRequestURI(), ex);
+        return problem(HttpStatus.CONFLICT,
+            ApiError.of("conflict", "Conflito", 409, "Operação conflitou com estado atual.", req.getRequestURI()));
     }
 
     @ExceptionHandler(Exception.class)

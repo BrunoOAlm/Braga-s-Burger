@@ -19,8 +19,9 @@ public class OrderController {
     }
 
     @PostMapping
-    public ResponseEntity<OrderResponse> create(@RequestBody @Valid CreateOrderRequest req) {
-        var order = service.create(req);
+    public ResponseEntity<OrderResponse> create(@RequestBody @Valid CreateOrderRequest req,
+                                                 @org.springframework.security.core.annotation.AuthenticationPrincipal com.bragas.api.auth.domain.User user) {
+        var order = service.create(req, user);
         var resp = OrderResponse.from(order);
         return ResponseEntity.created(URI.create("/api/v1/orders/" + order.getId())).body(resp);
     }

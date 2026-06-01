@@ -55,7 +55,7 @@ public class OrderService {
     }
 
     @Transactional
-    public Order create(CreateOrderRequest req) {
+    public Order create(CreateOrderRequest req, com.bragas.api.auth.domain.User user) {
         OffsetDateTime now = OffsetDateTime.now(clock);
 
         // 1. Loja aberta?
@@ -143,6 +143,7 @@ public class OrderService {
             order.addItem(new OrderItem(pos++, product.id(), product.name(), product.price(), i.quantity(), i.notes()));
         }
 
+        order.setUser(user);
         return repo.save(order);
     }
 

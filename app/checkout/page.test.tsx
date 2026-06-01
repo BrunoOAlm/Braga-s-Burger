@@ -48,6 +48,11 @@ let createOrderSpy: ReturnType<typeof vi.spyOn>;
 
 vi.mock('next/navigation', () => ({
   useRouter: () => ({ replace: vi.fn(), push: vi.fn() }),
+  useSearchParams: () => ({ get: () => null }),
+}));
+
+vi.mock('@/lib/auth-context', () => ({
+  useAuth: () => ({ state: { status: 'anonymous' } }),
 }));
 
 beforeEach(() => {
