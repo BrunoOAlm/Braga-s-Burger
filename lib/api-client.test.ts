@@ -1,4 +1,5 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
+import * as api from './api-client';
 import { createOrder, getOrder, ApiError } from './api-client';
 import type { CreateOrderRequest, OrderResponse } from './types-api';
 
@@ -126,5 +127,100 @@ describe('getOrder', () => {
     expect(init?.method).toBe('GET');
     expect(init?.body).toBeUndefined();
     expect(result).toEqual(sampleResponse);
+  });
+});
+
+describe('api-client auth (SP4b)', () => {
+  it('signup chama POST /auth/signup com credentials:include', async () => {
+    fetchSpy.mockResolvedValueOnce(
+      jsonResponse(201, {
+        id: 'usr_x',
+        email: 'a@b.c',
+        name: 'A',
+        phone: 'p',
+        createdAt: '2026-01-01',
+      }),
+    );
+
+    const user = await api.signup({
+      email: 'a@b.c',
+      password: 'senha12345',
+      name: 'A',
+      phone: 'p',
+    });
+
+    expect(fetchSpy).toHaveBeenCalledWith(
+      expect.stringContaining('/auth/signup'),
+      expect.objectContaining({ method: 'POST', credentials: 'include' }),
+    );
+    expect(user.id).toBe('usr_x');
+  });
+
+  it('login retorna void (204)', async () => {
+    fetchSpy.mockResolvedValueOnce(new Response(null, { status: 204 }));
+    await expect(
+      api.login({ email: 'a@b.c', password: 'senha12345' }),
+    ).resolves.toBeUndefined();
+  });
+
+  it('login com 401 invalid-credentials vira ApiError', async () => {
+    fetchSpy.mockResolvedValueOnce(
+      jsonResponse(401, {
+        type: 'https://bragas.com/errors/invalid-credentials',
+        title: 'Credenciais inválidas',
+        status: 401,
+        detail: 'E-mail ou senha incorretos.',
+      }),
+    );
+    await expect(
+      api.login({ email: 'x@y.z', password: 'errada' }),
+    ).rejects.toMatchObject({
+      status: 401,
+      type: 'invalid-credentials',
+    });
+  });
+
+  it('signup com 409 email-already-taken vira ApiError', async () => {
+    fetchSpy.mockResolvedValueOnce(
+      jsonResponse(409, {
+        type: 'https://bragas.com/errors/email-already-taken',
+        title: 'E-mail já cadastrado',
+        status: 409,
+        detail: 'já existe',
+      }),
+    );
+    await expect(
+      api.signup({
+        email: 'd@d.d',
+        password: 'senha12345',
+        name: 'D',
+        phone: 'p',
+      }),
+    ).rejects.toMatchObject({ status: 409, type: 'email-already-taken' });
+  });
+
+  it('429 too-many-requests', async () => {
+    fetchSpy.mockResolvedValueOnce(
+      jsonResponse(429, {
+        type: 'https://bragas.com/errors/too-many-requests',
+        title: 'Muitas requisições',
+        status: 429,
+        detail: 'aguarde',
+      }),
+    );
+    await expect(
+      api.forgotPassword({ email: 'a@b.c' }),
+    ).rejects.toMatchObject({ status: 429, type: 'too-many-requests' });
+  });
+
+  it('listMyOrders monta query string', async () => {
+    fetchSpy.mockResolvedValueOnce(
+      jsonResponse(200, { items: [], total: 0, limit: 20, offset: 0 }),
+    );
+    await api.listMyOrders(10, 5);
+    expect(fetchSpy).toHaveBeenCalledWith(
+      expect.stringContaining('/me/orders?limit=10&offset=5'),
+      expect.objectContaining({ credentials: 'include' }),
+    );
   });
 });
