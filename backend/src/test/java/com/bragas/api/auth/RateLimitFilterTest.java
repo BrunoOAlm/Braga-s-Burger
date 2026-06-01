@@ -6,7 +6,6 @@ import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 
@@ -24,8 +23,13 @@ class RateLimitFilterTest {
         verify(chain, org.mockito.Mockito.times(5)).doFilter(org.mockito.ArgumentMatchers.any(), org.mockito.ArgumentMatchers.any());
 
         var req = login(); var res = new MockHttpServletResponse();
-        assertThatThrownBy(() -> filter.doFilter(req, res, chain))
-            .isInstanceOf(RateLimitExceededException.class);
+        filter.doFilter(req, res, chain);
+        assertThat(res.getStatus()).isEqualTo(429);
+        assertThat(res.getContentType()).startsWith("application/problem+json");
+        assertThat(res.getContentAsString()).contains("too-many-requests");
+        assertThat(res.getHeader("Retry-After")).isNotNull();
+        // chain NÃO foi chamado na 6ª tentativa
+        verify(chain, org.mockito.Mockito.times(5)).doFilter(org.mockito.ArgumentMatchers.any(), org.mockito.ArgumentMatchers.any());
     }
 
     @Test

@@ -42,9 +42,24 @@ public class RateLimitFilter extends OncePerRequestFilter {
         ConsumptionProbe probe = bucket.tryConsumeAndReturnRemaining(1);
         if (!probe.isConsumed()) {
             long retryAfter = Math.max(1, probe.getNanosToWaitForRefill() / 1_000_000_000L);
-            throw new RateLimitExceededException(retryAfter);
+            writeTooManyRequests(request, response, retryAfter);
+            return;
         }
         chain.doFilter(request, response);
+    }
+
+    private static void writeTooManyRequests(HttpServletRequest request, HttpServletResponse response, long retryAfterSeconds)
+            throws IOException {
+        response.setStatus(429);
+        response.setContentType("application/problem+json");
+        response.setCharacterEncoding("UTF-8");
+        response.setHeader("Retry-After", String.valueOf(retryAfterSeconds));
+        String body = "{\"type\":\"https://bragas.com/errors/too-many-requests\","
+            + "\"title\":\"Muitas requisições\","
+            + "\"status\":429,"
+            + "\"detail\":\"Aguarde alguns instantes e tente de novo.\","
+            + "\"instance\":\"" + request.getRequestURI() + "\"}";
+        response.getWriter().write(body);
     }
 
     private Rule matchRule(HttpServletRequest request) {
