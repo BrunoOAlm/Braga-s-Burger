@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { Button } from '@/components/ui/Button';
 import { Logo } from '@/components/ui/Logo';
+import { HeaderUserMenu } from './HeaderUserMenu';
 
 const links = [
   { label: 'Cardápio', href: '#cardapio' },
@@ -36,8 +37,9 @@ export function Navbar() {
           ))}
         </ul>
 
-        {/* CTA — desktop */}
-        <div className="hidden md:block">
+        {/* CTA + user menu — desktop */}
+        <div className="hidden items-center gap-3 md:flex">
+          <HeaderUserMenu />
           <Button href="#cardapio">Peça agora</Button>
         </div>
 
@@ -98,6 +100,9 @@ export function Navbar() {
           >
             Peça agora
           </a>
+          <div className="mt-3">
+            <HeaderUserMenu />
+          </div>
         </div>
       )}
     </nav>
