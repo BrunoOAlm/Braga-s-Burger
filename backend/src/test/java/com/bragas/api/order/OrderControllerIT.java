@@ -1,5 +1,8 @@
 package com.bragas.api.order;
 
+import com.bragas.api.catalog.CategoryRepository;
+import com.bragas.api.catalog.ProductRepository;
+import com.bragas.api.catalog.domain.Product;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -17,6 +20,7 @@ import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
+import java.math.BigDecimal;
 import java.time.Clock;
 import java.time.Instant;
 import java.time.ZoneOffset;
@@ -52,11 +56,21 @@ class OrderControllerIT {
     }
 
     @Autowired MockMvc mvc;
+    @Autowired ProductRepository productRepo;
+    @Autowired CategoryRepository categoryRepo;
     private final ObjectMapper mapper = new ObjectMapper();
 
     @BeforeEach
     void cleanup(@Autowired OrderRepository repo) {
         repo.deleteAll();
+        // Cria produto fixture "esgotado-test" (available=false) usado por
+        // productUnavailable(). Idempotente — se já existir, no-op.
+        if (!productRepo.existsById("esgotado-test")) {
+            var burgers = categoryRepo.findById("burgers").orElseThrow();
+            var p = new Product("esgotado-test", burgers, "Esgotado (test fixture)", new BigDecimal("10.00"));
+            p.setAvailable(false);
+            productRepo.save(p);
+        }
     }
 
     private static final String VALID_DELIVERY = """

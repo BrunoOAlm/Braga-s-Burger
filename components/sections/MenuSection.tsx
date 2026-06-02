@@ -1,14 +1,26 @@
 'use client';
 
 import { useState } from 'react';
-import { categories, products } from '@/data/menu';
 import { filterProducts } from '@/lib/filter';
-import type { Category } from '@/lib/types';
+import type { Category, Product } from '@/lib/types';
 import { CategoryFilter } from './CategoryFilter';
 import { ProductCard } from './ProductCard';
 import { ProductList } from './ProductList';
 
-function CategoryBlock({ category, showHeading }: { category: Category; showHeading: boolean }) {
+interface MenuSectionProps {
+  categories: Category[];
+  products: Product[];
+}
+
+function CategoryBlock({
+  category,
+  products,
+  showHeading,
+}: {
+  category: Category;
+  products: Product[];
+  showHeading: boolean;
+}) {
   const items = filterProducts(products, category.id);
   if (items.length === 0) return null;
 
@@ -30,7 +42,7 @@ function CategoryBlock({ category, showHeading }: { category: Category; showHead
   );
 }
 
-export function MenuSection() {
+export function MenuSection({ categories, products }: MenuSectionProps) {
   const [active, setActive] = useState<string | null>(null);
   const sorted = [...categories].sort((a, b) => a.order - b.order);
   const visible = active === null ? sorted : sorted.filter((c) => c.id === active);
@@ -50,7 +62,12 @@ export function MenuSection() {
         </div>
 
         {visible.map((category) => (
-          <CategoryBlock key={category.id} category={category} showHeading={active === null} />
+          <CategoryBlock
+            key={category.id}
+            category={category}
+            products={products}
+            showHeading={active === null}
+          />
         ))}
       </div>
     </section>
