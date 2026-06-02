@@ -1,4 +1,0 @@
-[
-  { "code": "BEMVINDO10", "type": "PERCENT", "value": 10, "minSubtotal": null },
-  { "code": "FRETE5",     "type": "FIXED",   "value":  5, "minSubtotal":   40 }
-]

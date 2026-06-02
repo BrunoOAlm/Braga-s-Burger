@@ -19,7 +19,7 @@ public class OrderPricingCalculator {
     public Totals compute(List<Line> lines, Optional<Coupon> coupon, Optional<BigDecimal> deliveryFee) {
         BigDecimal rawSubtotal = BigDecimal.ZERO;
         for (var l : lines) {
-            rawSubtotal = rawSubtotal.add(l.product().price().multiply(BigDecimal.valueOf(l.quantity())));
+            rawSubtotal = rawSubtotal.add(l.product().getPrice().multiply(BigDecimal.valueOf(l.quantity())));
         }
         final BigDecimal subtotal = scale(rawSubtotal);
 
@@ -33,10 +33,10 @@ public class OrderPricingCalculator {
     }
 
     private BigDecimal applyCoupon(BigDecimal subtotal, Coupon c) {
-        return switch (c.type()) {
-            case PERCENT -> subtotal.multiply(c.value()).divide(BigDecimal.valueOf(100), 2, RoundingMode.HALF_UP);
-            case FIXED   -> c.value();
-        };
+        if ("percent".equals(c.getType())) {
+            return subtotal.multiply(c.getValue()).divide(BigDecimal.valueOf(100), 2, RoundingMode.HALF_UP);
+        }
+        return c.getValue();
     }
 
     private static BigDecimal scale(BigDecimal v) {
