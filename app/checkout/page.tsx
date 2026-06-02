@@ -4,7 +4,7 @@ import { Suspense, useEffect, useMemo, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useCartStore } from '@/lib/cart-store';
 import { useAuth } from '@/lib/auth-context';
-import { calcDiscount, calcSubtotal } from '@/lib/cart';
+import { calcSubtotal } from '@/lib/cart';
 import { isOpen } from '@/lib/store-status';
 import { estimateTotalMinutes } from '@/lib/delivery-time';
 import { buildWhatsAppMessage } from '@/lib/order-message';
@@ -94,7 +94,10 @@ function CheckoutPageInner() {
   const [submitting, setSubmitting] = useState(false);
 
   const subtotal = useMemo(() => calcSubtotal(items), [items]);
-  const discount = useMemo(() => calcDiscount(subtotal, coupon), [subtotal, coupon]);
+  // Desconto vem do POST /coupons/validate (salvo em coupon.discount). O
+  // backend recalcula tudo no POST /orders, então qualquer divergência
+  // é corrigida lá.
+  const discount = coupon?.discount ?? 0;
   const fee = useMemo(() => {
     if (method !== 'delivery' || !address) return 0;
     return (

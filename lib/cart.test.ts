@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
-import { calcSubtotal, calcDiscount, findCoupon, groupByCategory } from './cart';
-import type { CartItem, Coupon, Product, Category } from './types';
+import { calcSubtotal, groupByCategory } from './cart';
+import type { CartItem, Product, Category } from './types';
 
 const product = (id: string, categoryId: string, price: number): Product => ({
   id,
@@ -32,53 +32,6 @@ describe('calcSubtotal', () => {
 
   it('retorna 0 para carrinho vazio', () => {
     expect(calcSubtotal([])).toBe(0);
-  });
-});
-
-describe('calcDiscount', () => {
-  it('aplica desconto percentual', () => {
-    const c: Coupon = { code: 'X', type: 'percent', value: 10 };
-    expect(calcDiscount(100, c)).toBe(10);
-  });
-
-  it('aplica desconto fixo', () => {
-    const c: Coupon = { code: 'X', type: 'fixed', value: 7 };
-    expect(calcDiscount(100, c)).toBe(7);
-  });
-
-  it('retorna 0 se subtotal < minSubtotal', () => {
-    const c: Coupon = { code: 'X', type: 'fixed', value: 5, minSubtotal: 40 };
-    expect(calcDiscount(30, c)).toBe(0);
-  });
-
-  it('aplica desconto se subtotal == minSubtotal', () => {
-    const c: Coupon = { code: 'X', type: 'fixed', value: 5, minSubtotal: 40 };
-    expect(calcDiscount(40, c)).toBe(5);
-  });
-
-  it('retorna 0 quando cupom é null', () => {
-    expect(calcDiscount(100, null)).toBe(0);
-  });
-
-  it('não passa do subtotal (desconto fixo maior)', () => {
-    const c: Coupon = { code: 'X', type: 'fixed', value: 200 };
-    expect(calcDiscount(50, c)).toBe(50);
-  });
-});
-
-describe('findCoupon', () => {
-  const list: Coupon[] = [
-    { code: 'BEMVINDO10', type: 'percent', value: 10 },
-    { code: 'FRETE5', type: 'fixed', value: 5 },
-  ];
-
-  it('encontra cupom por código (case-insensitive)', () => {
-    expect(findCoupon('bemvindo10', list)?.code).toBe('BEMVINDO10');
-    expect(findCoupon('FRETE5', list)?.code).toBe('FRETE5');
-  });
-
-  it('retorna null pra código inexistente', () => {
-    expect(findCoupon('XYZ', list)).toBeNull();
   });
 });
 

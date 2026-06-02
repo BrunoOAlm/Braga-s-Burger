@@ -1,11 +1,11 @@
 'use client';
 
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
 import { useCartStore } from '@/lib/cart-store';
-import { calcDiscount, calcSubtotal, findCoupon } from '@/lib/cart';
+import { calcSubtotal } from '@/lib/cart';
 import { formatPrice } from '@/lib/format';
-import { coupons } from '@/data/coupons';
+import { validateCoupon } from '@/lib/menu-api';
 
 interface Props {
   open: boolean;
@@ -22,25 +22,64 @@ export function CartDrawer({ open, onClose }: Props) {
   const removeCoupon = useCartStore((s) => s.removeCoupon);
 
   const subtotal = useMemo(() => calcSubtotal(items), [items]);
-  const discount = useMemo(() => calcDiscount(subtotal, coupon), [subtotal, coupon]);
-  const total = subtotal - discount;
+  const discount = coupon?.discount ?? 0;
+  const total = Math.max(0, subtotal - discount);
 
   const [codeInput, setCodeInput] = useState('');
   const [couponError, setCouponError] = useState<string | null>(null);
+  const [applying, setApplying] = useState(false);
 
-  const handleApplyCoupon = () => {
+  // Re-valida o cupom quando o subtotal muda — backend pode recalcular
+  // discount (mudou o tipo) ou invalidar (caiu abaixo do min_subtotal).
+  useEffect(() => {
+    if (!coupon) return;
+    const handle = setTimeout(() => {
+      validateCoupon({ code: coupon.code, subtotal })
+        .then((res) => {
+          if (!res.valid) {
+            removeCoupon();
+            setCouponError('Cupom não é mais válido.');
+          } else if (res.discount !== coupon.discount) {
+            applyCoupon({
+              code: coupon.code,
+              type: res.type ?? coupon.type,
+              value: res.value ?? coupon.value,
+              discount: res.discount,
+            });
+          }
+        })
+        .catch(() => { /* falha de rede — mantém estado atual */ });
+    }, 400);
+    return () => clearTimeout(handle);
+    // intencional: roda quando subtotal muda; coupon entra como dep para
+    // pegar o code mais recente sem disparar loop (applyCoupon só dispara
+    // efeito se discount mudou).
+  }, [subtotal, coupon, applyCoupon, removeCoupon]);
+
+  const handleApplyCoupon = async () => {
+    if (applying) return;
     setCouponError(null);
-    const found = findCoupon(codeInput, coupons);
-    if (!found) {
-      setCouponError('Cupom inválido');
-      return;
+    const code = codeInput.trim();
+    if (!code) return;
+    setApplying(true);
+    try {
+      const res = await validateCoupon({ code, subtotal });
+      if (!res.valid) {
+        setCouponError('Cupom inválido ou não aplicável.');
+        return;
+      }
+      applyCoupon({
+        code: code.toUpperCase(),
+        type: res.type ?? 'fixed',
+        value: res.value ?? 0,
+        discount: res.discount,
+      });
+      setCodeInput('');
+    } catch {
+      setCouponError('Erro ao validar cupom. Tente de novo.');
+    } finally {
+      setApplying(false);
     }
-    if (found.minSubtotal && subtotal < found.minSubtotal) {
-      setCouponError(`Cupom requer subtotal de pelo menos ${formatPrice(found.minSubtotal)}`);
-      return;
-    }
-    applyCoupon(found);
-    setCodeInput('');
   };
 
   if (!open) return null;
@@ -139,9 +178,10 @@ export function CartDrawer({ open, onClose }: Props) {
                 <button
                   type="button"
                   onClick={handleApplyCoupon}
-                  className="cursor-pointer rounded border border-line px-3 py-1 text-sm hover:border-paper"
+                  disabled={applying}
+                  className="cursor-pointer rounded border border-line px-3 py-1 text-sm hover:border-paper disabled:cursor-wait disabled:opacity-60"
                 >
-                  Aplicar cupom
+                  {applying ? 'Validando...' : 'Aplicar cupom'}
                 </button>
               </div>
               {couponError && <p className="mt-1 text-sm text-faint">{couponError}</p>}
