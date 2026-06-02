@@ -6,6 +6,7 @@ import com.bragas.api.catalog.admin.dto.CouponResponse;
 import com.bragas.api.catalog.domain.Coupon;
 import com.bragas.api.catalog.exception.CatalogAlreadyExistsException;
 import com.bragas.api.catalog.exception.CouponNotFoundException;
+import com.bragas.api.common.DomainValidationException;
 import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -37,7 +38,8 @@ public class AdminCouponController {
     @Transactional
     public ResponseEntity<CouponResponse> create(@Valid @RequestBody CouponRequest req) {
         if (req.code() == null || req.type() == null || req.value() == null) {
-            throw new IllegalArgumentException("code, type, value obrigatorios");
+            throw new DomainValidationException("validation-failed", "Campos obrigatórios",
+                "POST exige code, type e value.");
         }
         String code = req.code().toUpperCase();
         if (repo.existsById(code)) throw new CatalogAlreadyExistsException("coupon-already-exists");

@@ -9,6 +9,7 @@ import com.bragas.api.catalog.exception.CatalogAlreadyExistsException;
 import com.bragas.api.catalog.exception.CategoryNotFoundException;
 import com.bragas.api.catalog.exception.ProductHasOrdersException;
 import com.bragas.api.catalog.exception.ProductNotFoundException;
+import com.bragas.api.common.DomainValidationException;
 import com.bragas.api.order.OrderRepository;
 import jakarta.validation.Valid;
 import org.slf4j.Logger;
@@ -48,7 +49,8 @@ public class AdminProductController {
     @Transactional
     public ResponseEntity<ProductResponse> create(@Valid @RequestBody ProductRequest req) {
         if (req.id() == null || req.categoryId() == null || req.name() == null || req.price() == null) {
-            throw new IllegalArgumentException("id, categoryId, name, price obrigatorios no POST");
+            throw new DomainValidationException("validation-failed", "Campos obrigatórios",
+                "POST exige id, categoryId, name e price.");
         }
         if (productRepo.existsById(req.id())) throw new CatalogAlreadyExistsException("product-already-exists");
         var category = categoryRepo.findById(req.categoryId())

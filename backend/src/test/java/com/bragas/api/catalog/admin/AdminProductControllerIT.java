@@ -66,6 +66,17 @@ class AdminProductControllerIT {
     }
 
     @Test
+    void create_without_required_fields_returns_400() throws Exception {
+        // sem categoryId, name, price — deve retornar 400 validation-failed, não 500
+        mvc.perform(post("/api/v1/admin/products")
+                .header("X-Admin-Token", "test-admin-token")
+                .contentType(APPLICATION_JSON)
+                .content("{\"id\":\"novo-z\"}"))
+            .andExpect(status().isBadRequest())
+            .andExpect(jsonPath("$.type").value("https://bragas.com/errors/validation-failed"));
+    }
+
+    @Test
     void list_returns_array() throws Exception {
         mvc.perform(get("/api/v1/admin/products")
                 .header("X-Admin-Token", "test-admin-token"))

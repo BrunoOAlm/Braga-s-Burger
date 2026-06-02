@@ -55,6 +55,17 @@ class AdminCouponControllerIT {
     }
 
     @Test
+    void create_without_required_fields_returns_400() throws Exception {
+        // sem type, value — 400 validation-failed, não 500
+        mvc.perform(post("/api/v1/admin/coupons")
+                .header("X-Admin-Token", "test-admin-token")
+                .contentType(APPLICATION_JSON)
+                .content("{\"code\":\"SOCODE\"}"))
+            .andExpect(status().isBadRequest())
+            .andExpect(jsonPath("$.type").value("https://bragas.com/errors/validation-failed"));
+    }
+
+    @Test
     void patch_to_inactive_sets_active_false() throws Exception {
         mvc.perform(patch("/api/v1/admin/coupons/BEMVINDO10")
                 .header("X-Admin-Token", "test-admin-token")

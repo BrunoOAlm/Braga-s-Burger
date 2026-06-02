@@ -169,23 +169,31 @@ function CheckoutPageInner() {
 
     setSubmitting(true);
     try {
-      const [order, menu] = await Promise.all([
-        api.createOrder({
-          customer,
-          fulfillmentType: method === 'delivery' ? 'DELIVERY' : 'PICKUP',
-          address: method === 'delivery' && address ? address : undefined,
-          payment: payment.toUpperCase() as 'PIX' | 'CASH' | 'CREDIT' | 'DEBIT',
-          changeFor: payment === 'cash' ? changeFor : undefined,
-          items: items.map((i) => ({
-            productId: i.product.id,
-            quantity: i.quantity,
-            notes: i.notes.trim() ? i.notes.trim() : undefined,
-          })),
-          couponCode: coupon?.code,
-        }),
-        getMenu({ revalidate: 300 }),
-      ]);
-      const { categories } = toLegacyMenu(menu);
+      // 1) Cria o pedido — passo crítico. Se falhar, nada mais acontece.
+      const order = await api.createOrder({
+        customer,
+        fulfillmentType: method === 'delivery' ? 'DELIVERY' : 'PICKUP',
+        address: method === 'delivery' && address ? address : undefined,
+        payment: payment.toUpperCase() as 'PIX' | 'CASH' | 'CREDIT' | 'DEBIT',
+        changeFor: payment === 'cash' ? changeFor : undefined,
+        items: items.map((i) => ({
+          productId: i.product.id,
+          quantity: i.quantity,
+          notes: i.notes.trim() ? i.notes.trim() : undefined,
+        })),
+        couponCode: coupon?.code,
+      });
+
+      // 2) Busca categorias só pra agrupar a mensagem do WhatsApp. Se /menu
+      // falhar, a mensagem sai sem grouping — o pedido JÁ FOI criado e o
+      // usuário não deve clicar de novo (evita pedidos duplicados).
+      let categories: ReturnType<typeof toLegacyMenu>['categories'] = [];
+      try {
+        const menu = await getMenu({ revalidate: 300 });
+        categories = toLegacyMenu(menu).categories;
+      } catch {
+        // intencional: degrade gracioso — segue com categories=[]
+      }
 
       const msg = buildWhatsAppMessage({
         orderId: order.displayId,

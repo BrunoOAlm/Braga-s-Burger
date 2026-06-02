@@ -1,7 +1,9 @@
 package com.bragas.api.order;
 
 import com.bragas.api.catalog.CategoryRepository;
+import com.bragas.api.catalog.CouponRepository;
 import com.bragas.api.catalog.ProductRepository;
+import com.bragas.api.catalog.domain.Coupon;
 import com.bragas.api.catalog.domain.Product;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
@@ -58,6 +60,7 @@ class OrderControllerIT {
     @Autowired MockMvc mvc;
     @Autowired ProductRepository productRepo;
     @Autowired CategoryRepository categoryRepo;
+    @Autowired CouponRepository couponRepo;
     private final ObjectMapper mapper = new ObjectMapper();
 
     @BeforeEach
@@ -135,6 +138,30 @@ class OrderControllerIT {
             .andExpect(status().isBadRequest())
             .andExpect(content().contentType("application/problem+json"))
             .andExpect(jsonPath("$.type", endsWith("product-not-found")));
+    }
+
+    @Test
+    void orderWithInactiveCouponReturns400() throws Exception {
+        // Setup: cria cupom inativo
+        var c = new Coupon("INATIVO_IT", "percent", new BigDecimal("10"));
+        c.setActive(false);
+        couponRepo.save(c);
+
+        String body = """
+            {
+              "customer": { "name": "João", "phone": "(21) 99999-0000" },
+              "fulfillmentType": "PICKUP",
+              "payment": "PIX",
+              "items": [
+                { "productId": "chicken", "quantity": 1 },
+                { "productId": "crispy-catupiry", "quantity": 1 }
+              ],
+              "couponCode": "INATIVO_IT"
+            }
+            """;
+        mvc.perform(post("/api/v1/orders").contentType("application/json").content(body))
+            .andExpect(status().isBadRequest())
+            .andExpect(jsonPath("$.type", endsWith("coupon-invalid")));
     }
 
     @Test

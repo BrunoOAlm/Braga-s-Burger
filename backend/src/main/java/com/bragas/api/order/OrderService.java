@@ -92,13 +92,25 @@ public class OrderService {
             }
         }
 
-        // 4. Cupom
+        // 4. Cupom — replica os guards de CouponService.validate (active +
+        // janela temporal) porque o cliente pode submeter um cupom que já
+        // foi desativado/expirou depois que CartDrawer validou.
         Optional<Coupon> coupon = Optional.ofNullable(req.couponCode())
             .map(String::toUpperCase)
             .flatMap(coupons::findById);
         if (req.couponCode() != null && coupon.isEmpty()) {
             throw new DomainValidationException("coupon-invalid", "Cupom inválido",
                 "Cupom " + req.couponCode() + " não existe.");
+        }
+        if (coupon.isPresent()) {
+            Coupon c = coupon.get();
+            boolean inactive = !c.isActive();
+            boolean beforeWindow = c.getValidFrom() != null && now.isBefore(c.getValidFrom());
+            boolean afterWindow = c.getValidUntil() != null && now.isAfter(c.getValidUntil());
+            if (inactive || beforeWindow || afterWindow) {
+                throw new DomainValidationException("coupon-invalid", "Cupom inválido",
+                    "Cupom " + c.getCode() + " não está mais disponível.");
+            }
         }
 
         // 5. Cálculo
