@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { categories, products } from '@/data/menu';
+import { fixtureCategories as categories, fixtureProducts as products } from '@/lib/__fixtures__/menu';
 import { MenuSection } from './MenuSection';
 
 describe('MenuSection', () => {

@@ -10,8 +10,9 @@ import { estimateTotalMinutes } from '@/lib/delivery-time';
 import { buildWhatsAppMessage } from '@/lib/order-message';
 import * as api from '@/lib/api-client';
 import { ApiError } from '@/lib/api-client';
+import { getMenu } from '@/lib/menu-api';
+import { toLegacyMenu } from '@/lib/menu-adapter';
 import { storeConfig } from '@/config/store';
-import { categories } from '@/data/menu';
 import { deliveryAreas } from '@/data/delivery';
 import { IdentificationStep } from '@/components/checkout/IdentificationStep';
 import { DeliveryStep } from '@/components/checkout/DeliveryStep';
@@ -168,19 +169,23 @@ function CheckoutPageInner() {
 
     setSubmitting(true);
     try {
-      const order = await api.createOrder({
-        customer,
-        fulfillmentType: method === 'delivery' ? 'DELIVERY' : 'PICKUP',
-        address: method === 'delivery' && address ? address : undefined,
-        payment: payment.toUpperCase() as 'PIX' | 'CASH' | 'CREDIT' | 'DEBIT',
-        changeFor: payment === 'cash' ? changeFor : undefined,
-        items: items.map((i) => ({
-          productId: i.product.id,
-          quantity: i.quantity,
-          notes: i.notes.trim() ? i.notes.trim() : undefined,
-        })),
-        couponCode: coupon?.code,
-      });
+      const [order, menu] = await Promise.all([
+        api.createOrder({
+          customer,
+          fulfillmentType: method === 'delivery' ? 'DELIVERY' : 'PICKUP',
+          address: method === 'delivery' && address ? address : undefined,
+          payment: payment.toUpperCase() as 'PIX' | 'CASH' | 'CREDIT' | 'DEBIT',
+          changeFor: payment === 'cash' ? changeFor : undefined,
+          items: items.map((i) => ({
+            productId: i.product.id,
+            quantity: i.quantity,
+            notes: i.notes.trim() ? i.notes.trim() : undefined,
+          })),
+          couponCode: coupon?.code,
+        }),
+        getMenu({ revalidate: 300 }),
+      ]);
+      const { categories } = toLegacyMenu(menu);
 
       const msg = buildWhatsAppMessage({
         orderId: order.displayId,
