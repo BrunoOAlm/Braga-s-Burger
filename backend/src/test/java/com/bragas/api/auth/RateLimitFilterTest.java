@@ -57,6 +57,38 @@ class RateLimitFilterTest {
         verify(chain, org.mockito.Mockito.times(50)).doFilter(org.mockito.ArgumentMatchers.any(), org.mockito.ArgumentMatchers.any());
     }
 
+    @Test
+    void coupon_validate_rate_limit_60_per_min() throws Exception {
+        var filter = new RateLimitFilter(true);
+        var chain = mock(FilterChain.class);
+        for (int i = 0; i < 60; i++) {
+            var req = new MockHttpServletRequest("POST", "/api/v1/coupons/validate");
+            req.setRemoteAddr("3.3.3.3");
+            filter.doFilter(req, new MockHttpServletResponse(), chain);
+        }
+        var req = new MockHttpServletRequest("POST", "/api/v1/coupons/validate");
+        req.setRemoteAddr("3.3.3.3");
+        var res = new MockHttpServletResponse();
+        filter.doFilter(req, res, chain);
+        assertThat(res.getStatus()).isEqualTo(429);
+    }
+
+    @Test
+    void admin_routes_rate_limit_30_per_min() throws Exception {
+        var filter = new RateLimitFilter(true);
+        var chain = mock(FilterChain.class);
+        for (int i = 0; i < 30; i++) {
+            var req = new MockHttpServletRequest("POST", "/api/v1/admin/products");
+            req.setRemoteAddr("4.4.4.4");
+            filter.doFilter(req, new MockHttpServletResponse(), chain);
+        }
+        var req = new MockHttpServletRequest("POST", "/api/v1/admin/products");
+        req.setRemoteAddr("4.4.4.4");
+        var res = new MockHttpServletResponse();
+        filter.doFilter(req, res, chain);
+        assertThat(res.getStatus()).isEqualTo(429);
+    }
+
     private MockHttpServletRequest login() {
         var r = new MockHttpServletRequest("POST", "/api/v1/auth/login");
         r.setRemoteAddr("9.9.9.9");

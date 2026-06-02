@@ -19,10 +19,12 @@ public class RateLimitFilter extends OncePerRequestFilter {
     private record Rule(String pathPrefix, long capacity, Duration refill) {}
 
     private static final Rule[] RULES = new Rule[] {
-        new Rule("/api/v1/auth/login",   5, Duration.ofMinutes(1)),
-        new Rule("/api/v1/auth/signup",  3, Duration.ofMinutes(1)),
-        new Rule("/api/v1/auth/forgot",  2, Duration.ofMinutes(1)),
-        new Rule("/api/v1/auth/reset",   5, Duration.ofMinutes(1)),
+        new Rule("/api/v1/auth/login",          5, Duration.ofMinutes(1)),
+        new Rule("/api/v1/auth/signup",         3, Duration.ofMinutes(1)),
+        new Rule("/api/v1/auth/forgot",         2, Duration.ofMinutes(1)),
+        new Rule("/api/v1/auth/reset",          5, Duration.ofMinutes(1)),
+        new Rule("/api/v1/coupons/validate",   60, Duration.ofMinutes(1)),
+        new Rule("/api/v1/admin/**",           30, Duration.ofMinutes(1)),
     };
 
     private final Map<String, Bucket> buckets = new ConcurrentHashMap<>();
@@ -72,9 +74,19 @@ public class RateLimitFilter extends OncePerRequestFilter {
     }
 
     private Rule matchRule(HttpServletRequest request) {
-        if (!"POST".equalsIgnoreCase(request.getMethod())) return null;
+        String method = request.getMethod();
+        if (!"POST".equalsIgnoreCase(method) && !"PATCH".equalsIgnoreCase(method) && !"DELETE".equalsIgnoreCase(method)) {
+            return null;
+        }
         String uri = request.getRequestURI();
-        for (Rule r : RULES) if (uri.equals(r.pathPrefix)) return r;
+        for (Rule r : RULES) {
+            if (r.pathPrefix.endsWith("/**")) {
+                String prefix = r.pathPrefix.substring(0, r.pathPrefix.length() - 3);
+                if (uri.startsWith(prefix)) return r;
+            } else if (uri.equals(r.pathPrefix)) {
+                return r;
+            }
+        }
         return null;
     }
 
