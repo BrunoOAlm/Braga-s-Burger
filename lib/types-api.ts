@@ -137,3 +137,43 @@ export interface OrdersPage {
   limit: number;
   offset: number;
 }
+
+// ── SP5a: catalogo dinamico ───────────────────────────────────────
+
+export type Layout = 'grid' | 'list';
+
+export interface ApiProduct {
+  id: string;
+  name: string;
+  description: string;
+  price: number;
+  priceFrom: boolean;
+  imageUrl: string | null;
+  featured: boolean;
+  available: boolean;
+  displayOrder: number;
+}
+
+export interface ApiCategory {
+  id: string;
+  name: string;
+  displayOrder: number;
+  layout: Layout;
+  products: ApiProduct[];
+}
+
+export interface MenuResponse {
+  categories: ApiCategory[];
+}
+
+export interface CouponValidationRequest {
+  code: string;
+  subtotal: number;
+}
+
+export interface CouponValidationResponse {
+  valid: boolean;
+  type?: 'percent' | 'fixed';
+  value?: number;
+  discount?: number;
+}

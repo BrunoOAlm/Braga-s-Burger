@@ -4,10 +4,10 @@ import { useState } from 'react';
 import { useReducedMotion } from 'framer-motion';
 import useEmblaCarousel from 'embla-carousel-react';
 import AutoScroll from 'embla-carousel-auto-scroll';
-import { products } from '@/data/menu';
+import type { Product } from '@/lib/types';
 import { ProductCard } from './ProductCard';
 
-export function FeaturedCarousel() {
+export function FeaturedCarousel({ products }: { products: Product[] }) {
   const featured = products.filter((product) => product.featured);
   const reduceMotion = useReducedMotion();
 

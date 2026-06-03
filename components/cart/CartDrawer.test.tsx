@@ -1,9 +1,18 @@
-import { describe, it, expect, beforeEach } from 'vitest';
-import { render, screen } from '@testing-library/react';
+import { describe, it, expect, beforeEach, vi } from 'vitest';
+import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { CartDrawer } from './CartDrawer';
 import { useCartStore } from '@/lib/cart-store';
 import type { Product } from '@/lib/types';
+
+vi.mock('@/lib/menu-api', () => ({
+  validateCoupon: vi.fn(async ({ code }: { code: string }) => {
+    if (code.toUpperCase() === 'BEMVINDO10') {
+      return { valid: true, type: 'percent', value: 10, discount: 2.59 };
+    }
+    return { valid: false };
+  }),
+}));
 
 const product = (id: string, price: number): Product => ({
   id,
@@ -39,12 +48,15 @@ describe('CartDrawer', () => {
     expect(useCartStore.getState().items[0].quantity).toBe(2);
   });
 
-  it('aplicar cupom adiciona ao estado', async () => {
+  it('aplicar cupom valido salva no estado', async () => {
     useCartStore.getState().addItem(product('chicken', 25.9));
     render(<CartDrawer open={true} onClose={() => {}} />);
     await userEvent.type(screen.getByLabelText(/cupom/i), 'BEMVINDO10');
     await userEvent.click(screen.getByRole('button', { name: /aplicar cupom/i }));
-    expect(useCartStore.getState().coupon?.code).toBe('BEMVINDO10');
+    await waitFor(() => {
+      expect(useCartStore.getState().coupon?.code).toBe('BEMVINDO10');
+    });
+    expect(useCartStore.getState().coupon?.discount).toBe(2.59);
   });
 
   it('cupom inválido mostra mensagem de erro', async () => {
@@ -52,7 +64,9 @@ describe('CartDrawer', () => {
     render(<CartDrawer open={true} onClose={() => {}} />);
     await userEvent.type(screen.getByLabelText(/cupom/i), 'XYZ');
     await userEvent.click(screen.getByRole('button', { name: /aplicar cupom/i }));
-    expect(screen.getByText(/cupom inválido/i)).toBeInTheDocument();
+    await waitFor(() => {
+      expect(screen.getByText(/cupom inválido/i)).toBeInTheDocument();
+    });
   });
 
   it('botão Fechar pedido aparece quando há itens', () => {

@@ -6,7 +6,7 @@ import * as api from '@/lib/api-client';
 import { ApiError } from '@/lib/api-client';
 import type { OrderResponse } from '@/lib/types-api';
 import { useCartStore } from '@/lib/cart-store';
-import { products } from '@/data/menu';
+import { fixtureProducts as products } from '@/lib/__fixtures__/menu';
 
 // Quarta-feira 19:00 BRT (loja aberta — storeConfig.openingHours.wed = ['18:00','23:40']).
 const OPEN_TIME = new Date('2026-05-20T22:00:00');
@@ -53,6 +53,15 @@ vi.mock('next/navigation', () => ({
 
 vi.mock('@/lib/auth-context', () => ({
   useAuth: () => ({ state: { status: 'anonymous' } }),
+}));
+
+vi.mock('@/lib/menu-api', () => ({
+  getMenu: vi.fn().mockResolvedValue({
+    categories: [
+      { id: 'burgers', name: 'Burgers', displayOrder: 10, layout: 'grid', products: [] },
+    ],
+  }),
+  validateCoupon: vi.fn().mockResolvedValue({ valid: false }),
 }));
 
 beforeEach(() => {

@@ -1,5 +1,6 @@
 package com.bragas.api.order.pricing;
 
+import com.bragas.api.catalog.domain.Category;
 import com.bragas.api.catalog.domain.Coupon;
 import com.bragas.api.catalog.domain.Product;
 import org.junit.jupiter.api.Test;
@@ -13,9 +14,10 @@ import static org.assertj.core.api.Assertions.assertThat;
 class OrderPricingCalculatorTest {
 
     private final OrderPricingCalculator calc = new OrderPricingCalculator();
+    private final Category cat = new Category("burgers", "Burgers", 10, "grid");
 
     private Product p(String id, String price) {
-        return new Product(id, "burgers", id, new BigDecimal(price), true);
+        return new Product(id, cat, id, new BigDecimal(price));
     }
 
     private OrderPricingCalculator.Line line(Product prod, int qty) {
@@ -32,7 +34,7 @@ class OrderPricingCalculatorTest {
     @Test
     void discountPercent() {
         var lines = List.of(line(p("a", "100.00"), 1));
-        var coupon = new Coupon("X", Coupon.Type.PERCENT, new BigDecimal("10"), null);
+        var coupon = new Coupon("X", "percent", new BigDecimal("10"));
         var totals = calc.compute(lines, Optional.of(coupon), Optional.empty());
         assertThat(totals.discount()).isEqualByComparingTo("10.00");
     }
@@ -40,7 +42,7 @@ class OrderPricingCalculatorTest {
     @Test
     void discountFixed() {
         var lines = List.of(line(p("a", "100.00"), 1));
-        var coupon = new Coupon("X", Coupon.Type.FIXED, new BigDecimal("15"), null);
+        var coupon = new Coupon("X", "fixed", new BigDecimal("15"));
         var totals = calc.compute(lines, Optional.of(coupon), Optional.empty());
         assertThat(totals.discount()).isEqualByComparingTo("15.00");
     }
@@ -48,7 +50,7 @@ class OrderPricingCalculatorTest {
     @Test
     void discountClampedToSubtotal() {
         var lines = List.of(line(p("a", "10.00"), 1));
-        var coupon = new Coupon("X", Coupon.Type.FIXED, new BigDecimal("999"), null);
+        var coupon = new Coupon("X", "fixed", new BigDecimal("999"));
         var totals = calc.compute(lines, Optional.of(coupon), Optional.empty());
         assertThat(totals.discount()).isEqualByComparingTo("10.00");
         assertThat(totals.total()).isEqualByComparingTo("0.00");

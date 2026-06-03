@@ -4,14 +4,15 @@ import { Suspense, useEffect, useMemo, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useCartStore } from '@/lib/cart-store';
 import { useAuth } from '@/lib/auth-context';
-import { calcDiscount, calcSubtotal } from '@/lib/cart';
+import { calcSubtotal } from '@/lib/cart';
 import { isOpen } from '@/lib/store-status';
 import { estimateTotalMinutes } from '@/lib/delivery-time';
 import { buildWhatsAppMessage } from '@/lib/order-message';
 import * as api from '@/lib/api-client';
 import { ApiError } from '@/lib/api-client';
+import { getMenu } from '@/lib/menu-api';
+import { toLegacyMenu } from '@/lib/menu-adapter';
 import { storeConfig } from '@/config/store';
-import { categories } from '@/data/menu';
 import { deliveryAreas } from '@/data/delivery';
 import { IdentificationStep } from '@/components/checkout/IdentificationStep';
 import { DeliveryStep } from '@/components/checkout/DeliveryStep';
@@ -94,7 +95,10 @@ function CheckoutPageInner() {
   const [submitting, setSubmitting] = useState(false);
 
   const subtotal = useMemo(() => calcSubtotal(items), [items]);
-  const discount = useMemo(() => calcDiscount(subtotal, coupon), [subtotal, coupon]);
+  // Desconto vem do POST /coupons/validate (salvo em coupon.discount). O
+  // backend recalcula tudo no POST /orders, então qualquer divergência
+  // é corrigida lá.
+  const discount = coupon?.discount ?? 0;
   const fee = useMemo(() => {
     if (method !== 'delivery' || !address) return 0;
     return (
@@ -165,6 +169,7 @@ function CheckoutPageInner() {
 
     setSubmitting(true);
     try {
+      // 1) Cria o pedido — passo crítico. Se falhar, nada mais acontece.
       const order = await api.createOrder({
         customer,
         fulfillmentType: method === 'delivery' ? 'DELIVERY' : 'PICKUP',
@@ -178,6 +183,17 @@ function CheckoutPageInner() {
         })),
         couponCode: coupon?.code,
       });
+
+      // 2) Busca categorias só pra agrupar a mensagem do WhatsApp. Se /menu
+      // falhar, a mensagem sai sem grouping — o pedido JÁ FOI criado e o
+      // usuário não deve clicar de novo (evita pedidos duplicados).
+      let categories: ReturnType<typeof toLegacyMenu>['categories'] = [];
+      try {
+        const menu = await getMenu({ revalidate: 300 });
+        categories = toLegacyMenu(menu).categories;
+      } catch {
+        // intencional: degrade gracioso — segue com categories=[]
+      }
 
       const msg = buildWhatsAppMessage({
         orderId: order.displayId,

@@ -2,7 +2,7 @@ import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import CheckoutPage from './page';
 import { useCartStore } from '@/lib/cart-store';
-import { products } from '@/data/menu';
+import { fixtureProducts as products } from '@/lib/__fixtures__/menu';
 
 vi.mock('next/navigation', () => ({
   useRouter: () => ({ replace: vi.fn(), push: vi.fn() }),

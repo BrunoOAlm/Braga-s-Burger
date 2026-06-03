@@ -5,8 +5,14 @@ import com.bragas.api.auth.InvalidCredentialsException;
 import com.bragas.api.auth.RateLimitExceededException;
 import com.bragas.api.auth.ResetTokenInvalidException;
 import com.bragas.api.auth.UnauthenticatedException;
-import com.bragas.api.catalog.ProductCatalog.UnknownProductException;
-import com.bragas.api.catalog.ProductCatalog.UnavailableProductException;
+import com.bragas.api.catalog.exception.CatalogAlreadyExistsException;
+import com.bragas.api.catalog.exception.CategoryHasProductsException;
+import com.bragas.api.catalog.exception.CategoryNotFoundException;
+import com.bragas.api.catalog.exception.CouponNotFoundException;
+import com.bragas.api.catalog.exception.ProductHasOrdersException;
+import com.bragas.api.catalog.exception.ProductNotFoundException;
+import com.bragas.api.catalog.exception.UnavailableProductException;
+import com.bragas.api.catalog.exception.UnknownProductException;
 import jakarta.servlet.http.HttpServletRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -48,6 +54,39 @@ public class ApiExceptionHandler {
         String title = ex instanceof UnavailableProductException ? "Produto indisponível" : "Produto não encontrado";
         return problem(HttpStatus.BAD_REQUEST,
             ApiError.of(slug, title, 400, ex.getMessage(), req.getRequestURI()));
+    }
+
+    @ExceptionHandler({ CategoryNotFoundException.class, ProductNotFoundException.class, CouponNotFoundException.class })
+    public ResponseEntity<ApiError> handleCatalogNotFound(RuntimeException ex, HttpServletRequest req) {
+        String slug = ex instanceof CategoryNotFoundException ? "category-not-found"
+            : ex instanceof ProductNotFoundException ? "product-not-found"
+            : "coupon-not-found";
+        String title = ex instanceof CategoryNotFoundException ? "Categoria não encontrada"
+            : ex instanceof ProductNotFoundException ? "Produto não encontrado"
+            : "Cupom não encontrado";
+        return problem(HttpStatus.NOT_FOUND,
+            ApiError.of(slug, title, 404, "Recurso não encontrado.", req.getRequestURI()));
+    }
+
+    @ExceptionHandler(CategoryHasProductsException.class)
+    public ResponseEntity<ApiError> handleCategoryHasProducts(CategoryHasProductsException ex, HttpServletRequest req) {
+        return problem(HttpStatus.CONFLICT,
+            ApiError.of("category-has-products", "Categoria possui produtos", 409,
+                "Mova ou apague os produtos antes de remover a categoria.", req.getRequestURI()));
+    }
+
+    @ExceptionHandler(ProductHasOrdersException.class)
+    public ResponseEntity<ApiError> handleProductHasOrders(ProductHasOrdersException ex, HttpServletRequest req) {
+        return problem(HttpStatus.CONFLICT,
+            ApiError.of("product-has-orders", "Produto referenciado em pedidos", 409,
+                "Este produto está em pedidos antigos. Marque-o como indisponível em vez de apagar.", req.getRequestURI()));
+    }
+
+    @ExceptionHandler(CatalogAlreadyExistsException.class)
+    public ResponseEntity<ApiError> handleAlreadyExists(CatalogAlreadyExistsException ex, HttpServletRequest req) {
+        return problem(HttpStatus.CONFLICT,
+            ApiError.of(ex.getSlug(), "Recurso já existe", 409,
+                "Já existe um recurso com esse identificador.", req.getRequestURI()));
     }
 
     @ExceptionHandler(OrderNotFoundException.class)

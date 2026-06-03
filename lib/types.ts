@@ -34,7 +34,8 @@ export interface Coupon {
   code: string;
   type: 'percent' | 'fixed';
   value: number; // 10 → 10% (percent) ou R$ 10 (fixed)
-  minSubtotal?: number; // subtotal mínimo (R$) para o cupom valer
+  minSubtotal?: number; // subtotal mínimo (R$) — usado só no DB seed legado
+  discount?: number; // calculado pelo backend em POST /coupons/validate
 }
 
 export interface Address {
