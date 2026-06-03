@@ -67,4 +67,16 @@ class AdminCategoryControllerIT {
                 .content("{\"id\":\"xtest\",\"name\":\"X\",\"layout\":\"invalid\"}"))
             .andExpect(status().isBadRequest());
     }
+
+    @Test
+    void patch_invalid_layout_returns_400_not_409() throws Exception {
+        // PATCH com layout inválido deve devolver 400 validation-failed,
+        // não cair no CHECK constraint do DB e virar 409 conflict.
+        mvc.perform(patch("/api/v1/admin/categories/burgers")
+                .header("X-Admin-Token", "test-admin-token")
+                .contentType(APPLICATION_JSON)
+                .content("{\"layout\":\"garbage\"}"))
+            .andExpect(status().isBadRequest())
+            .andExpect(jsonPath("$.type").value("https://bragas.com/errors/validation-failed"));
+    }
 }

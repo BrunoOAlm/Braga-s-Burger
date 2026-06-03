@@ -14,6 +14,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
+import java.math.BigDecimal;
 import java.net.URI;
 import java.util.List;
 
@@ -64,6 +65,24 @@ public class AdminCouponController {
         if (req.validFrom() != null) c.setValidFrom(req.validFrom());
         if (req.validUntil() != null) c.setValidUntil(req.validUntil());
         if (req.active() != null) c.setActive(req.active());
+
+        // @AssertTrue do CouponRequest só vê o body — re-checa as
+        // invariantes no estado merged pra evitar cair no CHECK do DB
+        // (que vira 409 conflict genérico) com bodies parciais tipo
+        // {"value": 150} em cupom já percent.
+        if ("percent".equals(c.getType()) && c.getValue() != null
+            && c.getValue().compareTo(BigDecimal.valueOf(100)) > 0) {
+            throw new DomainValidationException("coupon-percent-over-100",
+                "Percent value inválido",
+                "Cupom percent não pode ter value > 100.");
+        }
+        if (c.getValidFrom() != null && c.getValidUntil() != null
+            && !c.getValidFrom().isBefore(c.getValidUntil())) {
+            throw new DomainValidationException("coupon-invalid-window",
+                "Janela inválida",
+                "validFrom deve ser antes de validUntil.");
+        }
+
         log.info("admin.action action=PATCH resource=coupon code={}", c.getCode());
         return CouponResponse.from(c);
     }

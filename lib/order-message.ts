@@ -36,17 +36,27 @@ const PAYMENT_LABEL: Record<PaymentMethod, string> = {
   debit: 'Cartão de débito',
 };
 
+function itemLine(item: OrderForMessage['items'][number]): string[] {
+  const sub = item.product.price * item.quantity;
+  const lines = [`• ${item.quantity}x ${item.product.name} — ${formatPrice(sub)}`];
+  if (item.notes.trim().length > 0) {
+    lines.push(`   ↳ Obs: ${item.notes.trim()}`);
+  }
+  return lines;
+}
+
 function itemsBlock(order: OrderForMessage): string {
   const groups = groupByCategory(order.items, order.categories);
+  // Fallback: se categories veio vazio (ex.: GET /menu falhou no checkout),
+  // emite lista flat para não enviar mensagem sem itens.
+  if (groups.length === 0 && order.items.length > 0) {
+    return order.items.flatMap(itemLine).join('\n');
+  }
   return groups
     .map((g) => {
       const lines = [g.category.name.toUpperCase()];
       for (const item of g.items) {
-        const sub = item.product.price * item.quantity;
-        lines.push(`• ${item.quantity}x ${item.product.name} — ${formatPrice(sub)}`);
-        if (item.notes.trim().length > 0) {
-          lines.push(`   ↳ Obs: ${item.notes.trim()}`);
-        }
+        lines.push(...itemLine(item));
       }
       return lines.join('\n');
     })

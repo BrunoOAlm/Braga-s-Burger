@@ -66,6 +66,36 @@ class AdminCouponControllerIT {
     }
 
     @Test
+    void patch_percent_value_over_100_returns_400_not_409() throws Exception {
+        // BEMVINDO10 já é percent. PATCH só de value=150 não passa pelo
+        // @AssertTrue do DTO (que só vê o body — type fica null), mas
+        // depois do merge no controller a invariante é violada.
+        mvc.perform(patch("/api/v1/admin/coupons/BEMVINDO10")
+                .header("X-Admin-Token", "test-admin-token")
+                .contentType(APPLICATION_JSON)
+                .content("{\"value\":150}"))
+            .andExpect(status().isBadRequest())
+            .andExpect(jsonPath("$.type").value("https://bragas.com/errors/coupon-percent-over-100"));
+    }
+
+    @Test
+    void patch_invalid_window_returns_400_not_409() throws Exception {
+        // Setup: cria cupom com validFrom 2030, depois PATCH validUntil pra 2020
+        mvc.perform(post("/api/v1/admin/coupons")
+                .header("X-Admin-Token", "test-admin-token")
+                .contentType(APPLICATION_JSON)
+                .content("{\"code\":\"WINTEST\",\"type\":\"percent\",\"value\":10," +
+                    "\"validFrom\":\"2030-01-01T00:00:00Z\"}"))
+            .andExpect(status().isCreated());
+        mvc.perform(patch("/api/v1/admin/coupons/WINTEST")
+                .header("X-Admin-Token", "test-admin-token")
+                .contentType(APPLICATION_JSON)
+                .content("{\"validUntil\":\"2020-01-01T00:00:00Z\"}"))
+            .andExpect(status().isBadRequest())
+            .andExpect(jsonPath("$.type").value("https://bragas.com/errors/coupon-invalid-window"));
+    }
+
+    @Test
     void patch_to_inactive_sets_active_false() throws Exception {
         mvc.perform(patch("/api/v1/admin/coupons/BEMVINDO10")
                 .header("X-Admin-Token", "test-admin-token")

@@ -195,6 +195,21 @@ describe('buildWhatsAppMessage', () => {
     o.changeFor = undefined;
     expect(buildWhatsAppMessage(o)).not.toContain('Troco');
   });
+
+  it('fallback flat (sem grouping) quando categories=[] (ex.: GET /menu falhou)', () => {
+    const o = baseOrder();
+    o.categories = [];
+    const msg = buildWhatsAppMessage(o);
+    // Não há cabeçalhos de categoria
+    expect(msg).not.toContain('BURGERS');
+    expect(msg).not.toContain('PORÇÕES');
+    // Mas todos os itens aparecem
+    expect(msg).toContain('• 1x Chicken — R$ 25,90');
+    expect(msg).toContain('• 2x Crispy Catupiry — R$ 79,80');
+    expect(msg).toContain('• 1x Fritas Grande — R$ 29,90');
+    // E a observação também
+    expect(msg).toContain('   ↳ Obs: sem cebola');
+  });
 });
 
 describe('buildContactMessage', () => {
