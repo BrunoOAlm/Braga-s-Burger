@@ -52,4 +52,22 @@ class JwtServiceTest {
         assertThat(svc.verifyAndExtractUserId("not-a-jwt")).isEmpty();
         assertThat(svc.verifyAndExtractUserId("")).isEmpty();
     }
+
+    @Test
+    void issue_with_custom_ttl_token_expires_after_that_ttl() {
+        var fixed = java.time.Clock.fixed(java.time.Instant.parse("2026-01-01T00:00:00Z"), java.time.ZoneOffset.UTC);
+        var svc = new JwtService("test-secret-with-at-least-32-bytes-of-padding-yay-yay-yay", 604800, fixed);
+
+        String jwt = svc.issue("adm_xyz", 60);  // 1 minuto
+
+        // Avançar 30s — ainda válido
+        var clock30s = java.time.Clock.fixed(java.time.Instant.parse("2026-01-01T00:00:30Z"), java.time.ZoneOffset.UTC);
+        var svc30s = new JwtService("test-secret-with-at-least-32-bytes-of-padding-yay-yay-yay", 604800, clock30s);
+        org.assertj.core.api.Assertions.assertThat(svc30s.verifyAndExtractUserId(jwt)).contains("adm_xyz");
+
+        // Avançar 61s — expirado
+        var clock61s = java.time.Clock.fixed(java.time.Instant.parse("2026-01-01T00:01:01Z"), java.time.ZoneOffset.UTC);
+        var svc61s = new JwtService("test-secret-with-at-least-32-bytes-of-padding-yay-yay-yay", 604800, clock61s);
+        org.assertj.core.api.Assertions.assertThat(svc61s.verifyAndExtractUserId(jwt)).isEmpty();
+    }
 }

@@ -32,11 +32,15 @@ public class JwtService {
         this.clock = clock;
     }
 
-    public String issue(String userId) {
+    public String issue(String subject) {
+        return issue(subject, this.ttlSeconds);
+    }
+
+    public String issue(String subject, long ttlSeconds) {
         Instant now = clock.instant();
         return Jwts.builder()
             .issuer(ISSUER)
-            .subject(userId)
+            .subject(subject)
             .issuedAt(Date.from(now))
             .expiration(Date.from(now.plusSeconds(ttlSeconds)))
             .signWith(key)
