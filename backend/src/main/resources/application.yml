@@ -11,6 +11,13 @@ spring:
     open-in-view: false
   flyway:
     enabled: true
+    placeholders:
+      admin:
+        bootstrap:
+          id: ${ADMIN_BOOTSTRAP_ID}
+          email: ${ADMIN_BOOTSTRAP_EMAIL}
+          passwordHash: ${ADMIN_BOOTSTRAP_PASSWORD_HASH}
+          name: ${ADMIN_BOOTSTRAP_NAME:Admin}
   mail:
     host: ${MAIL_HOST:localhost}
     port: ${MAIL_PORT:1025}
