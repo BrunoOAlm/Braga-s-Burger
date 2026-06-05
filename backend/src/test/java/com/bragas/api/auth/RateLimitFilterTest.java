@@ -89,6 +89,24 @@ class RateLimitFilterTest {
         assertThat(res.getStatus()).isEqualTo(429);
     }
 
+    @Test
+    void admin_login_rate_limit_5_per_min() throws Exception {
+        var filter = new RateLimitFilter(true);
+        var chain = mock(FilterChain.class);
+
+        for (int i = 0; i < 5; i++) {
+            var req = new MockHttpServletRequest("POST", "/api/v1/auth/admin/login");
+            req.setRemoteAddr("5.5.5.5");
+            filter.doFilter(req, new MockHttpServletResponse(), chain);
+        }
+        var req = new MockHttpServletRequest("POST", "/api/v1/auth/admin/login");
+        req.setRemoteAddr("5.5.5.5");
+        var res = new MockHttpServletResponse();
+        filter.doFilter(req, res, chain);
+        assertThat(res.getStatus()).isEqualTo(429);
+        assertThat(res.getHeader("Retry-After")).isNotNull();
+    }
+
     private MockHttpServletRequest login() {
         var r = new MockHttpServletRequest("POST", "/api/v1/auth/login");
         r.setRemoteAddr("9.9.9.9");

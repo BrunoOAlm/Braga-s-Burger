@@ -23,6 +23,7 @@ public class RateLimitFilter extends OncePerRequestFilter {
         new Rule("/api/v1/auth/signup",         3, Duration.ofMinutes(1)),
         new Rule("/api/v1/auth/forgot",         2, Duration.ofMinutes(1)),
         new Rule("/api/v1/auth/reset",          5, Duration.ofMinutes(1)),
+        new Rule("/api/v1/auth/admin/login",    5, Duration.ofMinutes(1)),
         new Rule("/api/v1/coupons/validate",   60, Duration.ofMinutes(1)),
         new Rule("/api/v1/admin/**",           30, Duration.ofMinutes(1)),
     };
