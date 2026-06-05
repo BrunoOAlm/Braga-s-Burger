@@ -1,5 +1,8 @@
 package com.bragas.api.catalog.admin;
 
+import com.bragas.api.auth.admin.AdminAuthTestHelper;
+import jakarta.servlet.http.Cookie;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -34,11 +37,17 @@ class AdminCategoryControllerIT {
     }
 
     @Autowired MockMvc mvc;
+    private Cookie adminCookie;
+
+    @BeforeEach
+    void loginAdmin() throws Exception {
+        adminCookie = AdminAuthTestHelper.loginAndGetCookie(mvc);
+    }
 
     @Test
     void list_returns_seeded_categories() throws Exception {
         mvc.perform(get("/api/v1/admin/categories")
-                .header("X-Admin-Token", "test-admin-token"))
+                .cookie(adminCookie))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$").isArray());
     }
@@ -54,7 +63,7 @@ class AdminCategoryControllerIT {
     @Test
     void delete_category_with_products_returns_409() throws Exception {
         mvc.perform(delete("/api/v1/admin/categories/burgers")
-                .header("X-Admin-Token", "test-admin-token"))
+                .cookie(adminCookie))
             .andExpect(status().isConflict())
             .andExpect(jsonPath("$.type").value("https://bragas.com/errors/category-has-products"));
     }
@@ -62,7 +71,7 @@ class AdminCategoryControllerIT {
     @Test
     void invalid_layout_returns_400() throws Exception {
         mvc.perform(post("/api/v1/admin/categories")
-                .header("X-Admin-Token", "test-admin-token")
+                .cookie(adminCookie)
                 .contentType(APPLICATION_JSON)
                 .content("{\"id\":\"xtest\",\"name\":\"X\",\"layout\":\"invalid\"}"))
             .andExpect(status().isBadRequest());
@@ -70,10 +79,8 @@ class AdminCategoryControllerIT {
 
     @Test
     void patch_invalid_layout_returns_400_not_409() throws Exception {
-        // PATCH com layout inválido deve devolver 400 validation-failed,
-        // não cair no CHECK constraint do DB e virar 409 conflict.
         mvc.perform(patch("/api/v1/admin/categories/burgers")
-                .header("X-Admin-Token", "test-admin-token")
+                .cookie(adminCookie)
                 .contentType(APPLICATION_JSON)
                 .content("{\"layout\":\"garbage\"}"))
             .andExpect(status().isBadRequest())

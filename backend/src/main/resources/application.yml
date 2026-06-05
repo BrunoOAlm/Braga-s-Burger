@@ -51,8 +51,6 @@ app:
       thu: { open: "18:00", close: "23:40" }
       fri: { open: "18:00", close: "00:00" }
       sat: { open: "18:00", close: "00:00" }
-  admin:
-    token: ${ADMIN_TOKEN}
   cors:
     allowedOrigins:
       - "http://localhost:3000"

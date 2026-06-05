@@ -1,5 +1,8 @@
 package com.bragas.api.catalog.admin;
 
+import com.bragas.api.auth.admin.AdminAuthTestHelper;
+import jakarta.servlet.http.Cookie;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -34,11 +37,17 @@ class AdminProductControllerIT {
     }
 
     @Autowired MockMvc mvc;
+    private Cookie adminCookie;
+
+    @BeforeEach
+    void loginAdmin() throws Exception {
+        adminCookie = AdminAuthTestHelper.loginAndGetCookie(mvc);
+    }
 
     @Test
     void create_with_unknown_category_returns_404() throws Exception {
         mvc.perform(post("/api/v1/admin/products")
-                .header("X-Admin-Token", "test-admin-token")
+                .cookie(adminCookie)
                 .contentType(APPLICATION_JSON)
                 .content("{\"id\":\"novo-x\",\"categoryId\":\"naoexiste\",\"name\":\"Novo\",\"price\":10.00}"))
             .andExpect(status().isNotFound())
@@ -48,7 +57,7 @@ class AdminProductControllerIT {
     @Test
     void create_with_http_image_returns_400() throws Exception {
         mvc.perform(post("/api/v1/admin/products")
-                .header("X-Admin-Token", "test-admin-token")
+                .cookie(adminCookie)
                 .contentType(APPLICATION_JSON)
                 .content("{\"id\":\"novo-y\",\"categoryId\":\"burgers\",\"name\":\"Novo\",\"price\":10.00," +
                     "\"imageUrl\":\"http://insecure.com/img.png\"}"))
@@ -58,7 +67,7 @@ class AdminProductControllerIT {
     @Test
     void create_happy_path_returns_201() throws Exception {
         mvc.perform(post("/api/v1/admin/products")
-                .header("X-Admin-Token", "test-admin-token")
+                .cookie(adminCookie)
                 .contentType(APPLICATION_JSON)
                 .content("{\"id\":\"smoke-prod\",\"categoryId\":\"burgers\",\"name\":\"Smoke\",\"price\":10.00}"))
             .andExpect(status().isCreated())
@@ -67,9 +76,8 @@ class AdminProductControllerIT {
 
     @Test
     void create_without_required_fields_returns_400() throws Exception {
-        // sem categoryId, name, price — deve retornar 400 validation-failed, não 500
         mvc.perform(post("/api/v1/admin/products")
-                .header("X-Admin-Token", "test-admin-token")
+                .cookie(adminCookie)
                 .contentType(APPLICATION_JSON)
                 .content("{\"id\":\"novo-z\"}"))
             .andExpect(status().isBadRequest())
@@ -79,7 +87,7 @@ class AdminProductControllerIT {
     @Test
     void list_returns_array() throws Exception {
         mvc.perform(get("/api/v1/admin/products")
-                .header("X-Admin-Token", "test-admin-token"))
+                .cookie(adminCookie))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$").isArray());
     }

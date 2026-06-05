@@ -32,6 +32,7 @@ public class JwtCookieAuthFilter extends OncePerRequestFilter {
         String token = extractToken(request);
         if (token != null) {
             jwtService.verifyAndExtractUserId(token)
+                .filter(sub -> sub.startsWith("usr_"))
                 .flatMap(userRepository::findById)
                 .ifPresent(user -> {
                     var auth = new UsernamePasswordAuthenticationToken(

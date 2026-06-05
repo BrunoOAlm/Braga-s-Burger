@@ -12,7 +12,6 @@ class CookieFactoryAdminTest {
 
     private AppProperties props(boolean secure, String sameSite, long adminTtl) {
         return new AppProperties(
-            new AppProperties.Admin(null),
             new AppProperties.Cors(List.of()),
             new AppProperties.Auth("secret-32-bytes-long-padding-padding!!", secure, sameSite, 604800, adminTtl, false),
             new AppProperties.Mail("from@test", "http://reset")
