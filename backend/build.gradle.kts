@@ -4,6 +4,14 @@ plugins {
 	id("io.spring.dependency-management") version "1.1.7"
 }
 
+buildscript {
+	repositories { mavenCentral() }
+	dependencies {
+		classpath("org.springframework.security:spring-security-crypto:7.0.5")
+		classpath("commons-logging:commons-logging:1.3.6")
+	}
+}
+
 group = "com.bragas"
 version = "0.0.1-SNAPSHOT"
 description = "Backend de pedidos do Braga's Burger"
@@ -49,4 +57,28 @@ dependencies {
 
 tasks.withType<Test> {
 	useJUnitPlatform()
+}
+
+tasks.register("bcryptHash") {
+	description = "Generate a bcrypt hash for a password. Usage: ./gradlew bcryptHash -Ppassword=YOUR_PASSWORD"
+	group = "verification"
+	doLast {
+		val pwd = (project.findProperty("password") as String?)
+			?: throw GradleException("Missing -Ppassword=YOUR_PASSWORD")
+		val encoder = org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder(10)
+		println(encoder.encode(pwd))
+	}
+}
+
+tasks.register("bcryptVerify") {
+	description = "Verify a bcrypt hash matches a password. Usage: ./gradlew bcryptVerify -Phash=... -Ppassword=..."
+	group = "verification"
+	doLast {
+		val pwd = (project.findProperty("password") as String?)
+			?: throw GradleException("Missing -Ppassword=YOUR_PASSWORD")
+		val hash = (project.findProperty("hash") as String?)
+			?: throw GradleException("Missing -Phash=BCRYPT_HASH")
+		val encoder = org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder(10)
+		println("matches=${encoder.matches(pwd, hash)}")
+	}
 }

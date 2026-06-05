@@ -6,6 +6,14 @@ spring:
       ddl-auto: validate
     properties:
       hibernate.format_sql: false
+  flyway:
+    placeholders:
+      admin:
+        bootstrap:
+          id: adm_test_0000000000000000
+          email: admin@test.local
+          passwordHash: $2a$10$DFllBYGtAXFOggqcyPbaqeP4HDMgOt07g9rDq1LXacsBUQpd/7v7a
+          name: Admin Test
 
 logging:
   level:
@@ -22,8 +30,6 @@ app:
       thu: { open: "18:00", close: "23:40" }
       fri: { open: "18:00", close: "00:00" }
       sat: { open: "18:00", close: "00:00" }
-  admin:
-    token: test-admin-token
   cors:
     allowedOrigins: []
   auth:
@@ -31,6 +37,7 @@ app:
     cookieSecure: false
     cookieSameSite: Lax
     jwtTtlSeconds: 3600
+    adminCookieTtlSeconds: 1800
     rateLimitEnabled: false
   mail:
     from: test@bragas.local

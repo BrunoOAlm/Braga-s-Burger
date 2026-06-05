@@ -1,5 +1,6 @@
 package com.bragas.api.catalog.admin;
 
+import com.bragas.api.auth.admin.CurrentAdmin;
 import com.bragas.api.catalog.CategoryRepository;
 import com.bragas.api.catalog.ProductRepository;
 import com.bragas.api.catalog.admin.dto.CategoryRequest;
@@ -47,7 +48,7 @@ public class AdminCategoryController {
             req.displayOrder() != null ? req.displayOrder() : 100,
             req.layout() != null ? req.layout() : "grid");
         categoryRepo.save(c);
-        log.info("admin.action action=POST resource=category id={}", c.getId());
+        log.info("admin.action action=POST resource=category id={} actor={}", c.getId(), CurrentAdmin.id());
         return ResponseEntity.created(URI.create("/api/v1/admin/categories/" + c.getId()))
             .body(CategoryResponse.from(c));
     }
@@ -72,7 +73,7 @@ public class AdminCategoryController {
         if (req.name() != null && !req.name().isBlank()) c.setName(req.name());
         if (req.displayOrder() != null) c.setDisplayOrder(req.displayOrder());
         if (req.layout() != null && !req.layout().isBlank()) c.setLayout(req.layout());
-        log.info("admin.action action=PATCH resource=category id={}", c.getId());
+        log.info("admin.action action=PATCH resource=category id={} actor={}", c.getId(), CurrentAdmin.id());
         return CategoryResponse.from(c);
     }
 
@@ -84,7 +85,7 @@ public class AdminCategoryController {
             throw new CategoryHasProductsException();
         }
         categoryRepo.delete(c);
-        log.info("admin.action action=DELETE resource=category id={}", id);
+        log.info("admin.action action=DELETE resource=category id={} actor={}", id, CurrentAdmin.id());
         return ResponseEntity.noContent().build();
     }
 }

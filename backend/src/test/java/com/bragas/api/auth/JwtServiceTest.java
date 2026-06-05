@@ -52,4 +52,20 @@ class JwtServiceTest {
         assertThat(svc.verifyAndExtractUserId("not-a-jwt")).isEmpty();
         assertThat(svc.verifyAndExtractUserId("")).isEmpty();
     }
+
+    @Test
+    void issue_with_custom_ttl_token_expires_after_that_ttl() {
+        var fixed = Clock.fixed(Instant.parse("2026-01-01T00:00:00Z"), ZoneOffset.UTC);
+        var svc = new JwtService(SECRET, 604800, fixed);
+
+        String jwt = svc.issue("adm_xyz", 60);
+
+        var clock30s = Clock.fixed(Instant.parse("2026-01-01T00:00:30Z"), ZoneOffset.UTC);
+        var svc30s = new JwtService(SECRET, 604800, clock30s);
+        assertThat(svc30s.verifyAndExtractUserId(jwt)).contains("adm_xyz");
+
+        var clock61s = Clock.fixed(Instant.parse("2026-01-01T00:01:01Z"), ZoneOffset.UTC);
+        var svc61s = new JwtService(SECRET, 604800, clock61s);
+        assertThat(svc61s.verifyAndExtractUserId(jwt)).isEmpty();
+    }
 }

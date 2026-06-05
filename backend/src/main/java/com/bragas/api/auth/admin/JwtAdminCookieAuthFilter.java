@@ -1,6 +1,6 @@
-package com.bragas.api.auth;
+package com.bragas.api.auth.admin;
 
-import com.bragas.api.auth.domain.User;
+import com.bragas.api.auth.JwtService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.Cookie;
@@ -14,16 +14,17 @@ import org.springframework.web.filter.OncePerRequestFilter;
 import java.io.IOException;
 import java.util.List;
 
-public class JwtCookieAuthFilter extends OncePerRequestFilter {
+public class JwtAdminCookieAuthFilter extends OncePerRequestFilter {
 
-    public static final String COOKIE_NAME = "bb_session";
+    public static final String COOKIE_NAME = "bb_admin";
+    private static final String SUB_PREFIX = "adm_";
 
     private final JwtService jwtService;
-    private final UserRepository userRepository;
+    private final AdminUserRepository repository;
 
-    public JwtCookieAuthFilter(JwtService jwtService, UserRepository userRepository) {
+    public JwtAdminCookieAuthFilter(JwtService jwtService, AdminUserRepository repository) {
         this.jwtService = jwtService;
-        this.userRepository = userRepository;
+        this.repository = repository;
     }
 
     @Override
@@ -32,11 +33,11 @@ public class JwtCookieAuthFilter extends OncePerRequestFilter {
         String token = extractToken(request);
         if (token != null) {
             jwtService.verifyAndExtractUserId(token)
-                .filter(sub -> sub.startsWith("usr_"))
-                .flatMap(userRepository::findById)
-                .ifPresent(user -> {
+                .filter(sub -> sub.startsWith(SUB_PREFIX))
+                .flatMap(repository::findById)
+                .ifPresent(admin -> {
                     var auth = new UsernamePasswordAuthenticationToken(
-                        user, null, List.of(new SimpleGrantedAuthority("ROLE_USER")));
+                        admin, null, List.of(new SimpleGrantedAuthority("ROLE_ADMIN")));
                     SecurityContextHolder.getContext().setAuthentication(auth);
                 });
         }

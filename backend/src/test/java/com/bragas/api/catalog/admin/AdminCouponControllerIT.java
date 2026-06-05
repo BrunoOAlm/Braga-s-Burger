@@ -1,5 +1,8 @@
 package com.bragas.api.catalog.admin;
 
+import com.bragas.api.auth.admin.AdminAuthTestHelper;
+import jakarta.servlet.http.Cookie;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -34,11 +37,17 @@ class AdminCouponControllerIT {
     }
 
     @Autowired MockMvc mvc;
+    private Cookie adminCookie;
+
+    @BeforeEach
+    void loginAdmin() throws Exception {
+        adminCookie = AdminAuthTestHelper.loginAndGetCookie(mvc);
+    }
 
     @Test
     void create_percent_over_100_returns_400() throws Exception {
         mvc.perform(post("/api/v1/admin/coupons")
-                .header("X-Admin-Token", "test-admin-token")
+                .cookie(adminCookie)
                 .contentType(APPLICATION_JSON)
                 .content("{\"code\":\"TOOMUCH\",\"type\":\"percent\",\"value\":150}"))
             .andExpect(status().isBadRequest());
@@ -47,7 +56,7 @@ class AdminCouponControllerIT {
     @Test
     void create_invalid_window_returns_400() throws Exception {
         mvc.perform(post("/api/v1/admin/coupons")
-                .header("X-Admin-Token", "test-admin-token")
+                .cookie(adminCookie)
                 .contentType(APPLICATION_JSON)
                 .content("{\"code\":\"BADWIN\",\"type\":\"percent\",\"value\":10," +
                     "\"validFrom\":\"2025-01-02T00:00:00Z\",\"validUntil\":\"2025-01-01T00:00:00Z\"}"))
@@ -56,9 +65,8 @@ class AdminCouponControllerIT {
 
     @Test
     void create_without_required_fields_returns_400() throws Exception {
-        // sem type, value — 400 validation-failed, não 500
         mvc.perform(post("/api/v1/admin/coupons")
-                .header("X-Admin-Token", "test-admin-token")
+                .cookie(adminCookie)
                 .contentType(APPLICATION_JSON)
                 .content("{\"code\":\"SOCODE\"}"))
             .andExpect(status().isBadRequest())
@@ -67,11 +75,8 @@ class AdminCouponControllerIT {
 
     @Test
     void patch_percent_value_over_100_returns_400_not_409() throws Exception {
-        // BEMVINDO10 já é percent. PATCH só de value=150 não passa pelo
-        // @AssertTrue do DTO (que só vê o body — type fica null), mas
-        // depois do merge no controller a invariante é violada.
         mvc.perform(patch("/api/v1/admin/coupons/BEMVINDO10")
-                .header("X-Admin-Token", "test-admin-token")
+                .cookie(adminCookie)
                 .contentType(APPLICATION_JSON)
                 .content("{\"value\":150}"))
             .andExpect(status().isBadRequest())
@@ -80,15 +85,14 @@ class AdminCouponControllerIT {
 
     @Test
     void patch_invalid_window_returns_400_not_409() throws Exception {
-        // Setup: cria cupom com validFrom 2030, depois PATCH validUntil pra 2020
         mvc.perform(post("/api/v1/admin/coupons")
-                .header("X-Admin-Token", "test-admin-token")
+                .cookie(adminCookie)
                 .contentType(APPLICATION_JSON)
                 .content("{\"code\":\"WINTEST\",\"type\":\"percent\",\"value\":10," +
                     "\"validFrom\":\"2030-01-01T00:00:00Z\"}"))
             .andExpect(status().isCreated());
         mvc.perform(patch("/api/v1/admin/coupons/WINTEST")
-                .header("X-Admin-Token", "test-admin-token")
+                .cookie(adminCookie)
                 .contentType(APPLICATION_JSON)
                 .content("{\"validUntil\":\"2020-01-01T00:00:00Z\"}"))
             .andExpect(status().isBadRequest())
@@ -98,14 +102,13 @@ class AdminCouponControllerIT {
     @Test
     void patch_to_inactive_sets_active_false() throws Exception {
         mvc.perform(patch("/api/v1/admin/coupons/BEMVINDO10")
-                .header("X-Admin-Token", "test-admin-token")
+                .cookie(adminCookie)
                 .contentType(APPLICATION_JSON)
                 .content("{\"active\":false}"))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.active").value(false));
-        // restaura o estado pra não vazar pra outros ITs
         mvc.perform(patch("/api/v1/admin/coupons/BEMVINDO10")
-                .header("X-Admin-Token", "test-admin-token")
+                .cookie(adminCookie)
                 .contentType(APPLICATION_JSON)
                 .content("{\"active\":true}"))
             .andExpect(status().isOk());

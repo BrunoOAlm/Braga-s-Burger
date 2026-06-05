@@ -11,6 +11,13 @@ spring:
     open-in-view: false
   flyway:
     enabled: true
+    placeholders:
+      admin:
+        bootstrap:
+          id: ${ADMIN_BOOTSTRAP_ID}
+          email: ${ADMIN_BOOTSTRAP_EMAIL}
+          passwordHash: ${ADMIN_BOOTSTRAP_PASSWORD_HASH}
+          name: ${ADMIN_BOOTSTRAP_NAME:Admin}
   mail:
     host: ${MAIL_HOST:localhost}
     port: ${MAIL_PORT:1025}
@@ -44,8 +51,6 @@ app:
       thu: { open: "18:00", close: "23:40" }
       fri: { open: "18:00", close: "00:00" }
       sat: { open: "18:00", close: "00:00" }
-  admin:
-    token: ${ADMIN_TOKEN}
   cors:
     allowedOrigins:
       - "http://localhost:3000"
@@ -54,6 +59,7 @@ app:
     cookieSecure: ${COOKIE_SECURE:false}
     cookieSameSite: ${COOKIE_SAME_SITE:Lax}
     jwtTtlSeconds: 604800
+    adminCookieTtlSeconds: 28800
     rateLimitEnabled: ${RATE_LIMIT_ENABLED:true}
   mail:
     from: ${MAIL_FROM:no-reply@bragas.local}

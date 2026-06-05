@@ -1,6 +1,8 @@
 package com.bragas.api.order;
 
+import com.bragas.api.auth.admin.AdminAuthTestHelper;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.servlet.http.Cookie;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -54,6 +56,12 @@ class OrderAdminControllerIT {
 
     @Autowired MockMvc mvc;
     private final ObjectMapper mapper = new ObjectMapper();
+    private Cookie adminCookie;
+
+    @BeforeEach
+    void loginAdmin() throws Exception {
+        adminCookie = AdminAuthTestHelper.loginAndGetCookie(mvc);
+    }
 
     @BeforeEach
     void cleanup(@Autowired OrderRepository repo) {
@@ -79,31 +87,31 @@ class OrderAdminControllerIT {
     }
 
     @Test
-    void patchSemTokenRetorna401() throws Exception {
+    void patchSemCookieRetorna401() throws Exception {
         String id = createOrderAndReturnId();
         mvc.perform(patch("/api/v1/admin/orders/" + id + "/status")
                 .contentType("application/json")
                 .content("{\"to\":\"PREPARING\"}"))
             .andExpect(status().isUnauthorized())
-            .andExpect(jsonPath("$.type", endsWith("admin-token-missing")));
+            .andExpect(jsonPath("$.type", endsWith("unauthenticated")));
     }
 
     @Test
-    void patchTokenErradoRetorna401() throws Exception {
+    void patchComCookieInvalidoRetorna401() throws Exception {
         String id = createOrderAndReturnId();
         mvc.perform(patch("/api/v1/admin/orders/" + id + "/status")
-                .header("X-Admin-Token", "errado")
+                .cookie(new Cookie("bb_admin", "jwt-invalido"))
                 .contentType("application/json")
                 .content("{\"to\":\"PREPARING\"}"))
             .andExpect(status().isUnauthorized())
-            .andExpect(jsonPath("$.type", endsWith("admin-token-invalid")));
+            .andExpect(jsonPath("$.type", endsWith("unauthenticated")));
     }
 
     @Test
     void transicaoValidaGravaTimestamp() throws Exception {
         String id = createOrderAndReturnId();
         mvc.perform(patch("/api/v1/admin/orders/" + id + "/status")
-                .header("X-Admin-Token", "test-admin-token")
+                .cookie(adminCookie)
                 .contentType("application/json")
                 .content("{\"to\":\"PREPARING\"}"))
             .andExpect(status().isOk())
@@ -116,7 +124,7 @@ class OrderAdminControllerIT {
     void transicaoInvalidaRetorna409() throws Exception {
         String id = createOrderAndReturnId();
         mvc.perform(patch("/api/v1/admin/orders/" + id + "/status")
-                .header("X-Admin-Token", "test-admin-token")
+                .cookie(adminCookie)
                 .contentType("application/json")
                 .content("{\"to\":\"DELIVERED\"}"))
             .andExpect(status().isConflict())
@@ -126,7 +134,7 @@ class OrderAdminControllerIT {
     @Test
     void pedidoInexistenteRetorna404() throws Exception {
         mvc.perform(patch("/api/v1/admin/orders/ord_nao_existe/status")
-                .header("X-Admin-Token", "test-admin-token")
+                .cookie(adminCookie)
                 .contentType("application/json")
                 .content("{\"to\":\"PREPARING\"}"))
             .andExpect(status().isNotFound())
@@ -138,7 +146,7 @@ class OrderAdminControllerIT {
         String id = createOrderAndReturnId();
         for (String to : new String[]{"PREPARING", "OUT", "DELIVERED"}) {
             mvc.perform(patch("/api/v1/admin/orders/" + id + "/status")
-                    .header("X-Admin-Token", "test-admin-token")
+                    .cookie(adminCookie)
                     .contentType("application/json")
                     .content("{\"to\":\"" + to + "\"}"))
                 .andExpect(status().isOk())

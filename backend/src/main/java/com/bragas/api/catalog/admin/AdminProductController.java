@@ -1,5 +1,6 @@
 package com.bragas.api.catalog.admin;
 
+import com.bragas.api.auth.admin.CurrentAdmin;
 import com.bragas.api.catalog.CategoryRepository;
 import com.bragas.api.catalog.ProductRepository;
 import com.bragas.api.catalog.admin.dto.ProductRequest;
@@ -63,7 +64,7 @@ public class AdminProductController {
         if (req.available() != null) p.setAvailable(req.available());
         if (req.displayOrder() != null) p.setDisplayOrder(req.displayOrder());
         productRepo.save(p);
-        log.info("admin.action action=POST resource=product id={}", p.getId());
+        log.info("admin.action action=POST resource=product id={} actor={}", p.getId(), CurrentAdmin.id());
         return ResponseEntity.created(URI.create("/api/v1/admin/products/" + p.getId()))
             .body(ProductResponse.from(p));
     }
@@ -85,7 +86,7 @@ public class AdminProductController {
         if (req.featured() != null) p.setFeatured(req.featured());
         if (req.available() != null) p.setAvailable(req.available());
         if (req.displayOrder() != null) p.setDisplayOrder(req.displayOrder());
-        log.info("admin.action action=PATCH resource=product id={}", p.getId());
+        log.info("admin.action action=PATCH resource=product id={} actor={}", p.getId(), CurrentAdmin.id());
         return ProductResponse.from(p);
     }
 
@@ -97,7 +98,7 @@ public class AdminProductController {
             throw new ProductHasOrdersException();
         }
         productRepo.delete(p);
-        log.info("admin.action action=DELETE resource=product id={}", id);
+        log.info("admin.action action=DELETE resource=product id={} actor={}", id, CurrentAdmin.id());
         return ResponseEntity.noContent().build();
     }
 }
