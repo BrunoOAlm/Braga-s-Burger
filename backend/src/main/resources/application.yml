@@ -61,6 +61,7 @@ app:
     cookieSecure: ${COOKIE_SECURE:false}
     cookieSameSite: ${COOKIE_SAME_SITE:Lax}
     jwtTtlSeconds: 604800
+    adminCookieTtlSeconds: 28800
     rateLimitEnabled: ${RATE_LIMIT_ENABLED:true}
   mail:
     from: ${MAIL_FROM:no-reply@bragas.local}

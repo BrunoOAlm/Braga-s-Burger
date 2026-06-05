@@ -39,6 +39,7 @@ app:
     cookieSecure: false
     cookieSameSite: Lax
     jwtTtlSeconds: 3600
+    adminCookieTtlSeconds: 1800
     rateLimitEnabled: false
   mail:
     from: test@bragas.local
