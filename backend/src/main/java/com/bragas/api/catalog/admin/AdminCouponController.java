@@ -1,5 +1,6 @@
 package com.bragas.api.catalog.admin;
 
+import com.bragas.api.auth.admin.CurrentAdmin;
 import com.bragas.api.catalog.CouponRepository;
 import com.bragas.api.catalog.admin.dto.CouponRequest;
 import com.bragas.api.catalog.admin.dto.CouponResponse;
@@ -50,7 +51,7 @@ public class AdminCouponController {
         if (req.validUntil() != null) c.setValidUntil(req.validUntil());
         if (req.active() != null) c.setActive(req.active());
         repo.save(c);
-        log.info("admin.action action=POST resource=coupon code={}", c.getCode());
+        log.info("admin.action action=POST resource=coupon code={} actor={}", c.getCode(), CurrentAdmin.id());
         return ResponseEntity.created(URI.create("/api/v1/admin/coupons/" + c.getCode()))
             .body(CouponResponse.from(c));
     }
@@ -83,7 +84,7 @@ public class AdminCouponController {
                 "validFrom deve ser antes de validUntil.");
         }
 
-        log.info("admin.action action=PATCH resource=coupon code={}", c.getCode());
+        log.info("admin.action action=PATCH resource=coupon code={} actor={}", c.getCode(), CurrentAdmin.id());
         return CouponResponse.from(c);
     }
 
@@ -93,7 +94,7 @@ public class AdminCouponController {
         String upper = code.toUpperCase();
         if (!repo.existsById(upper)) throw new CouponNotFoundException(code);
         repo.deleteById(upper);
-        log.info("admin.action action=DELETE resource=coupon code={}", upper);
+        log.info("admin.action action=DELETE resource=coupon code={} actor={}", upper, CurrentAdmin.id());
         return ResponseEntity.noContent().build();
     }
 }
