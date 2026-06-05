@@ -69,3 +69,16 @@ tasks.register("bcryptHash") {
 		println(encoder.encode(pwd))
 	}
 }
+
+tasks.register("bcryptVerify") {
+	description = "Verify a bcrypt hash matches a password. Usage: ./gradlew bcryptVerify -Phash=... -Ppassword=..."
+	group = "verification"
+	doLast {
+		val pwd = (project.findProperty("password") as String?)
+			?: throw GradleException("Missing -Ppassword=YOUR_PASSWORD")
+		val hash = (project.findProperty("hash") as String?)
+			?: throw GradleException("Missing -Phash=BCRYPT_HASH")
+		val encoder = org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder(10)
+		println("matches=${encoder.matches(pwd, hash)}")
+	}
+}
