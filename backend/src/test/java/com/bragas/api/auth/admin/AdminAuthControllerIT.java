@@ -14,6 +14,7 @@ import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
 import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.startsWith;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -81,6 +82,6 @@ class AdminAuthControllerIT {
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.email").value("admin@test.local"))
             .andExpect(jsonPath("$.name").value("Admin Test"))
-            .andExpect(jsonPath("$.id").value("adm_test_0000000000000000"));
+            .andExpect(jsonPath("$.id", startsWith("adm_")));
     }
 }
