@@ -60,11 +60,20 @@ class AdminAuthControllerIT {
     }
 
     @Test
-    void logout_returns_204_and_clears_cookie() throws Exception {
-        mvc.perform(post("/api/v1/auth/admin/logout"))
+    void logout_with_admin_cookie_returns_204_and_clears_cookie() throws Exception {
+        Cookie cookie = AdminAuthTestHelper.loginAndGetCookie(mvc);
+
+        mvc.perform(post("/api/v1/auth/admin/logout").cookie(cookie))
             .andExpect(status().isNoContent())
             .andExpect(header().string("Set-Cookie", containsString("bb_admin=")))
             .andExpect(header().string("Set-Cookie", containsString("Max-Age=0")));
+    }
+
+    @Test
+    void logout_without_admin_cookie_returns_401() throws Exception {
+        mvc.perform(post("/api/v1/auth/admin/logout"))
+            .andExpect(status().isUnauthorized())
+            .andExpect(jsonPath("$.type").value("https://bragas.com/errors/unauthenticated"));
     }
 
     @Test
