@@ -12,11 +12,14 @@ spring:
   flyway:
     enabled: true
     placeholders:
+      # Legacy placeholders usados pela V5; V6 deleta o admin inserido por V5
+      # imediatamente. Defaults garantem que o boot nao quebre se essas envs
+      # nao estiverem setadas (SP5b.1 substitui esse fluxo por AdminBootstrap).
       admin:
         bootstrap:
-          id: ${ADMIN_BOOTSTRAP_ID}
-          email: ${ADMIN_BOOTSTRAP_EMAIL}
-          passwordHash: ${ADMIN_BOOTSTRAP_PASSWORD_HASH}
+          id: ${ADMIN_BOOTSTRAP_ID:adm_legacy_v5_placeholder}
+          email: ${ADMIN_BOOTSTRAP_EMAIL:admin@legacy.local}
+          passwordHash: ${ADMIN_BOOTSTRAP_PASSWORD_HASH:$2a$10$qCHHJh7uAYd9ui80fB.i6..L6lFNzgSpbMB4bpwECKu4ACCC/ecvO}
           name: ${ADMIN_BOOTSTRAP_NAME:Admin}
   mail:
     host: ${MAIL_HOST:localhost}
