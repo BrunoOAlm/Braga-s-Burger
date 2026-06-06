@@ -40,6 +40,10 @@ management:
       show-details: when-authorized
 
 app:
+  admin-bootstrap:
+    email:    ${ADMIN_BOOTSTRAP_EMAIL:}
+    password: ${ADMIN_BOOTSTRAP_PASSWORD:}
+    name:     ${ADMIN_BOOTSTRAP_NAME:Admin}
   store:
     minOrder: 25.00
     averagePrepTime: 25

@@ -20,6 +20,10 @@ logging:
     org.hibernate.SQL: WARN
 
 app:
+  admin-bootstrap:
+    email:    admin@test.local
+    password: admin-test-pwd
+    name:     Admin Test
   store:
     minOrder: 25.00
     averagePrepTime: 25
