@@ -14,7 +14,8 @@ class CookieFactoryAdminTest {
         return new AppProperties(
             new AppProperties.Cors(List.of()),
             new AppProperties.Auth("secret-32-bytes-long-padding-padding!!", secure, sameSite, 604800, adminTtl, false),
-            new AppProperties.Mail("from@test", "http://reset")
+            new AppProperties.Mail("from@test", "http://reset"),
+            new AppProperties.AdminBootstrap(null, null, null)
         );
     }
 

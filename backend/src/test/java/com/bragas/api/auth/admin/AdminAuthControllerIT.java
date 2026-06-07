@@ -14,6 +14,7 @@ import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
 import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.startsWith;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -59,11 +60,20 @@ class AdminAuthControllerIT {
     }
 
     @Test
-    void logout_returns_204_and_clears_cookie() throws Exception {
-        mvc.perform(post("/api/v1/auth/admin/logout"))
+    void logout_with_admin_cookie_returns_204_and_clears_cookie() throws Exception {
+        Cookie cookie = AdminAuthTestHelper.loginAndGetCookie(mvc);
+
+        mvc.perform(post("/api/v1/auth/admin/logout").cookie(cookie))
             .andExpect(status().isNoContent())
             .andExpect(header().string("Set-Cookie", containsString("bb_admin=")))
             .andExpect(header().string("Set-Cookie", containsString("Max-Age=0")));
+    }
+
+    @Test
+    void logout_without_admin_cookie_returns_401() throws Exception {
+        mvc.perform(post("/api/v1/auth/admin/logout"))
+            .andExpect(status().isUnauthorized())
+            .andExpect(jsonPath("$.type").value("https://bragas.com/errors/unauthenticated"));
     }
 
     @Test
@@ -81,6 +91,6 @@ class AdminAuthControllerIT {
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.email").value("admin@test.local"))
             .andExpect(jsonPath("$.name").value("Admin Test"))
-            .andExpect(jsonPath("$.id").value("adm_test_0000000000000000"));
+            .andExpect(jsonPath("$.id", startsWith("adm_")));
     }
 }

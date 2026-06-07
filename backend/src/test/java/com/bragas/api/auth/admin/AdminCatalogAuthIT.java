@@ -51,6 +51,6 @@ class AdminCatalogAuthIT {
                 .content("{\"id\":\"audit-prod\",\"categoryId\":\"burgers\",\"name\":\"Audit\",\"price\":10.00}"))
             .andExpect(status().isCreated());
 
-        assertThat(out.getOut()).contains("admin.action action=POST resource=product id=audit-prod actor=adm_test_0000000000000000");
+        assertThat(out.getOut()).containsPattern("admin\\.action action=POST resource=product id=audit-prod actor=adm_[A-Z0-9]+");
     }
 }
