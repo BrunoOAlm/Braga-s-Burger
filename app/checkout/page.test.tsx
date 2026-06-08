@@ -117,16 +117,15 @@ describe('CheckoutPage — submit integrado', () => {
     expect(payload.address).toBeUndefined();
   });
 
-  it('em sucesso, abre WhatsApp com o displayId do response (não gerado client-side)', async () => {
+  it('em sucesso, NÃO abre WhatsApp no submit (SP5c removeu duplicacao)', async () => {
     const user = userEvent.setup({ advanceTimers: vi.advanceTimersByTime });
     render(<CheckoutPage />);
 
     await fillUntilReview(user);
     await user.click(screen.getByRole('button', { name: /enviar pedido/i }));
 
-    await waitFor(() => expect(openSpy).toHaveBeenCalled());
-    const url = openSpy.mock.calls[0][0] as string;
-    expect(decodeURIComponent(url)).toContain('#3417');
+    await waitFor(() => expect(createOrderSpy).toHaveBeenCalled());
+    expect(openSpy).not.toHaveBeenCalled();
   });
 
   it('em ApiError(store-closed) mostra mensagem humanizada e fica na tela review', async () => {

@@ -208,7 +208,7 @@ export function OrderStatusScreen({
           {STEPS[activeIndex].label} —{' '}
           <span className="text-muted">
             {status === 'RECEIVED'
-              ? 'aguardando confirmação da loja no WhatsApp.'
+              ? 'aguardando confirmação da loja.'
               : status === 'PREPARING'
                 ? 'sua comida já está sendo preparada.'
                 : status === 'OUT'
