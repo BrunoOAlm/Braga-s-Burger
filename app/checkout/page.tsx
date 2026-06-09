@@ -7,11 +7,8 @@ import { useAuth } from '@/lib/auth-context';
 import { calcSubtotal } from '@/lib/cart';
 import { isOpen } from '@/lib/store-status';
 import { estimateTotalMinutes } from '@/lib/delivery-time';
-import { buildWhatsAppMessage } from '@/lib/order-message';
 import * as api from '@/lib/api-client';
 import { ApiError } from '@/lib/api-client';
-import { getMenu } from '@/lib/menu-api';
-import { toLegacyMenu } from '@/lib/menu-adapter';
 import { storeConfig } from '@/config/store';
 import { deliveryAreas } from '@/data/delivery';
 import { IdentificationStep } from '@/components/checkout/IdentificationStep';
@@ -183,39 +180,6 @@ function CheckoutPageInner() {
         })),
         couponCode: coupon?.code,
       });
-
-      // 2) Busca categorias só pra agrupar a mensagem do WhatsApp. Se /menu
-      // falhar, a mensagem sai sem grouping — o pedido JÁ FOI criado e o
-      // usuário não deve clicar de novo (evita pedidos duplicados).
-      let categories: ReturnType<typeof toLegacyMenu>['categories'] = [];
-      try {
-        const menu = await getMenu({ revalidate: 300 });
-        categories = toLegacyMenu(menu).categories;
-      } catch {
-        // intencional: degrade gracioso — segue com categories=[]
-      }
-
-      const msg = buildWhatsAppMessage({
-        orderId: order.displayId,
-        customer,
-        items,
-        categories,
-        coupon,
-        subtotal: order.totals.subtotal,
-        discount: order.totals.discount,
-        deliveryFee: order.totals.deliveryFee,
-        total: order.totals.total,
-        estimatedMinutes: order.estimatedMinutes,
-        method,
-        address: method === 'delivery' ? address! : undefined,
-        payment,
-        changeFor: payment === 'cash' ? changeFor : undefined,
-        storeBusinessName: storeConfig.whatsappBusinessName,
-        storeAddress: storeConfig.address,
-      });
-
-      const url = `https://wa.me/${storeConfig.whatsappNumber}?text=${encodeURIComponent(msg)}`;
-      window.open(url, '_blank');
 
       setOrderId(order.id);
       setSentEstimate(order.estimatedMinutes);

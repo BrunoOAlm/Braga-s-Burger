@@ -20,6 +20,9 @@ import com.bragas.api.store.StoreStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+
 import java.math.BigDecimal;
 import java.time.Clock;
 import java.time.LocalDateTime;
@@ -28,6 +31,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 
 @Service
 public class OrderService {
@@ -179,6 +183,11 @@ public class OrderService {
     @Transactional(readOnly = true)
     public Order findByDisplayId(String displayId) {
         return repo.findByDisplayId(displayId).orElseThrow(() -> new OrderNotFoundException(displayId));
+    }
+
+    @Transactional(readOnly = true)
+    public Page<Order> searchByStatus(Set<OrderStatus> statuses, Pageable pageable) {
+        return repo.findByStatusInOrderByCreatedAtDesc(statuses, pageable);
     }
 
     @Transactional
