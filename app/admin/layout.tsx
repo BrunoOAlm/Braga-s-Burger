@@ -8,7 +8,7 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
   return (
     <AdminAuthProvider>
       <AdminAuthGate>
-        <div className="flex min-h-screen bg-neutral-50">
+        <div className="flex min-h-screen bg-neutral-50 text-neutral-900">
           <AdminSidebar />
           <div className="flex flex-1 flex-col">
             <AdminHeader />

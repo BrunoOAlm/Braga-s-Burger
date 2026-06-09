@@ -18,7 +18,9 @@ export function AdminAuthGate({ children }: { children: ReactNode }) {
     }
   }, [admin, loading, pathname, router]);
 
-  if (pathname === LOGIN_PATH) return <>{children}</>;
+  if (pathname === LOGIN_PATH) {
+    return <div className="min-h-screen bg-neutral-50 text-neutral-900">{children}</div>;
+  }
   if (loading) {
     return <div className="p-8 text-center text-sm text-neutral-500">Carregando…</div>;
   }

@@ -55,7 +55,7 @@ export function AdminLoginForm() {
           onChange={(e) => setEmail(e.target.value)}
           required
           autoComplete="email"
-          className="w-full rounded border border-neutral-300 px-3 py-2 text-sm"
+          className="w-full rounded border border-neutral-300 bg-white px-3 py-2 text-sm text-neutral-900"
         />
       </FormField>
       <FormField label="Senha" htmlFor="adm-pwd" required>
@@ -66,7 +66,7 @@ export function AdminLoginForm() {
           onChange={(e) => setPassword(e.target.value)}
           required
           autoComplete="current-password"
-          className="w-full rounded border border-neutral-300 px-3 py-2 text-sm"
+          className="w-full rounded border border-neutral-300 bg-white px-3 py-2 text-sm text-neutral-900"
         />
       </FormField>
       <button
