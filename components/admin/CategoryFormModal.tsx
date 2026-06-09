@@ -1,5 +1,5 @@
 'use client';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { AdminCategory, ApiError } from '@/lib/admin-api';
 import { FormModal } from './FormModal';
 import { FormField } from '@/components/ui/FormField';
@@ -23,11 +23,14 @@ export function CategoryFormModal({ open, mode, category, onClose, onSubmit }: P
   const [draft, setDraft] = useState<AdminCategory>(category ?? EMPTY);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [prevKey, setPrevKey] = useState({ category, open });
 
-  useEffect(() => {
+  // "Adjusting state during render": reseta o form quando a prop muda.
+  if (prevKey.category !== category || prevKey.open !== open) {
+    setPrevKey({ category, open });
     setDraft(category ?? EMPTY);
     setError(null);
-  }, [category, open]);
+  }
 
   async function handle() {
     setSubmitting(true);

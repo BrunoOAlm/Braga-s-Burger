@@ -12,6 +12,9 @@ export function AdminHeader() {
   const [sound, setSound] = useState(true);
 
   useEffect(() => {
+    // Hidratação pós-SSR: estado inicial usa default (true) porque SSR não acessa
+    // window. Sincronizamos no client lendo localStorage uma vez no mount.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setSound(localStorage.getItem(SOUND_KEY) !== 'false');
   }, []);
 

@@ -1,5 +1,5 @@
 'use client';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { AdminCategory, AdminProduct, ApiError } from '@/lib/admin-api';
 import { FormModal } from './FormModal';
 import { FormField } from '@/components/ui/FormField';
@@ -40,11 +40,15 @@ export function ProductFormModal({
   const [draft, setDraft] = useState<AdminProduct>(product ?? EMPTY);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [prevKey, setPrevKey] = useState({ product, open });
 
-  useEffect(() => {
+  // "Adjusting state during render": reseta o form quando a prop muda.
+  // https://react.dev/learn/you-might-not-need-an-effect#adjusting-some-state-when-a-prop-changes
+  if (prevKey.product !== product || prevKey.open !== open) {
+    setPrevKey({ product, open });
     setDraft(product ?? EMPTY);
     setError(null);
-  }, [product, open]);
+  }
 
   async function handle() {
     setSubmitting(true);

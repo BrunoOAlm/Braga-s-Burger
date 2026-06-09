@@ -9,7 +9,6 @@ import {
   useState,
 } from 'react';
 import * as adminApi from './admin-api';
-import { ApiError } from './admin-api';
 
 type AdminUser = adminApi.AdminUser;
 
@@ -23,28 +22,38 @@ type AdminAuthState = {
 
 const Ctx = createContext<AdminAuthState | undefined>(undefined);
 
+async function fetchMe(): Promise<AdminUser | null> {
+  try {
+    return await adminApi.me();
+  } catch (e) {
+    // 401 (não logado) e qualquer outro erro caem no mesmo estado: sem admin.
+    void e;
+    return null;
+  }
+}
+
 export function AdminAuthProvider({ children }: { children: ReactNode }) {
   const [admin, setAdmin] = useState<AdminUser | null>(null);
   const [loading, setLoading] = useState(true);
 
   const refresh = useCallback(async () => {
-    try {
-      const u = await adminApi.me();
-      setAdmin(u);
-    } catch (e) {
-      if (e instanceof ApiError && e.status === 401) {
-        setAdmin(null);
-      } else {
-        setAdmin(null);
-      }
-    } finally {
-      setLoading(false);
-    }
+    const u = await fetchMe();
+    setAdmin(u);
+    setLoading(false);
   }, []);
 
   useEffect(() => {
-    void refresh();
-  }, [refresh]);
+    let cancelled = false;
+    void (async () => {
+      const u = await fetchMe();
+      if (cancelled) return;
+      setAdmin(u);
+      setLoading(false);
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   const login = useCallback(
     async (email: string, password: string) => {

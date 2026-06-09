@@ -1,5 +1,5 @@
 'use client';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { AdminCoupon, ApiError } from '@/lib/admin-api';
 import { FormModal } from './FormModal';
 import { FormField } from '@/components/ui/FormField';
@@ -25,11 +25,14 @@ export function CouponFormModal({ open, mode, coupon, onClose, onSubmit }: Props
   const [draft, setDraft] = useState<AdminCoupon>(coupon ?? EMPTY);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [prevKey, setPrevKey] = useState({ coupon, open });
 
-  useEffect(() => {
+  // "Adjusting state during render": reseta o form quando a prop muda.
+  if (prevKey.coupon !== coupon || prevKey.open !== open) {
+    setPrevKey({ coupon, open });
     setDraft(coupon ?? EMPTY);
     setError(null);
-  }, [coupon, open]);
+  }
 
   function validate(): string | null {
     if (draft.type === 'percent' && (draft.value <= 0 || draft.value > 100)) {
