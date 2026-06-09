@@ -3,8 +3,7 @@ import type { ProblemDetails } from './types-api';
 
 export { ApiError };
 
-const BASE_URL =
-  process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:8080/api/v1';
+const BASE_URL = process.env.NEXT_PUBLIC_API_URL ?? '/api/v1';
 
 type ReqInit = Omit<RequestInit, 'body'> & { body?: unknown; signal?: AbortSignal };
 
