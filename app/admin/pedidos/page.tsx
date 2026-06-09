@@ -25,7 +25,7 @@ function countByStatus(orders: AdminOrder[]) {
 export default function PedidosPage() {
   const search = useSearchParams();
   const scope = search?.get('scope') === 'history' ? 'history' : 'active';
-  const { orders, loading, error, newOrder, clearNewOrder } = useOrderQueue(
+  const { orders, loading, error, newOrder, clearNewOrder, refetch } = useOrderQueue(
     scope as 'active' | 'history',
   );
   const [pendingCancel, setPendingCancel] = useState<{ id: string } | null>(null);
@@ -43,12 +43,14 @@ export default function PedidosPage() {
       return;
     }
     await adminApi.updateOrderStatus(orderId, to);
+    await refetch();
   }
 
   async function confirmCancel() {
     if (!pendingCancel) return;
     await adminApi.updateOrderStatus(pendingCancel.id, 'CANCELLED');
     setPendingCancel(null);
+    await refetch();
   }
 
   const counts = countByStatus(orders);

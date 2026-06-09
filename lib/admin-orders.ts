@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import * as adminApi from './admin-api';
 import { AdminOrder, ApiError } from './admin-api';
 
@@ -14,10 +14,16 @@ export function useOrderQueue(scope: 'active' | 'history') {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<ApiError | null>(null);
   const [newOrder, setNewOrder] = useState<AdminOrder | null>(null);
-  const lastCountRef = useRef(0);
+  const seenIdsRef = useRef<Set<string>>(new Set());
   const firstPollDoneRef = useRef(false);
+  const pollRef = useRef<() => Promise<void>>(() => Promise.resolve());
 
   useEffect(() => {
+    // Reset de tracking ao trocar de scope: evita alerta espúrio na primeira poll da nova aba
+    // e impede que IDs vistos em 'history' contaminem a detecção em 'active'.
+    seenIdsRef.current = new Set();
+    firstPollDoneRef.current = false;
+
     let cancelled = false;
     let abortCtrl: AbortController | null = null;
     let intervalId: ReturnType<typeof setInterval> | null = null;
@@ -30,15 +36,13 @@ export function useOrderQueue(scope: 'active' | 'history') {
         const status = scope === 'active' ? ACTIVE : HISTORY;
         const res = await adminApi.getOrders({ status, size: 100, signal: abortCtrl.signal });
         if (cancelled) return;
-        if (
-          scope === 'active' &&
-          firstPollDoneRef.current &&
-          res.items.length > lastCountRef.current
-        ) {
-          const newest = res.items[0];
+        if (scope === 'active' && firstPollDoneRef.current) {
+          // Detecção por ID (não por count): sobrevive a cancel+novo no mesmo intervalo
+          // de polling, que mantinha o count igual e perdia o alerta.
+          const newest = res.items.find((o) => !seenIdsRef.current.has(o.id));
           if (newest) setNewOrder(newest);
         }
-        lastCountRef.current = res.items.length;
+        seenIdsRef.current = new Set(res.items.map((o) => o.id));
         firstPollDoneRef.current = true;
         setOrders(res.items);
         setError(null);
@@ -51,6 +55,7 @@ export function useOrderQueue(scope: 'active' | 'history') {
       }
     }
 
+    pollRef.current = poll;
     poll();
     intervalId = setInterval(poll, POLL_MS);
 
@@ -67,7 +72,16 @@ export function useOrderQueue(scope: 'active' | 'history') {
     };
   }, [scope]);
 
-  return { orders, loading, error, newOrder, clearNewOrder: () => setNewOrder(null) };
+  const refetch = useCallback(() => pollRef.current(), []);
+
+  return {
+    orders,
+    loading,
+    error,
+    newOrder,
+    clearNewOrder: () => setNewOrder(null),
+    refetch,
+  };
 }
 
 const SOUND_KEY = 'admin-sound-enabled';

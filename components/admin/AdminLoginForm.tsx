@@ -21,7 +21,9 @@ export function AdminLoginForm() {
     setSubmitting(true);
     try {
       await login(email, password);
-      const next = search?.get('next') || '/admin/pedidos';
+      const raw = search?.get('next');
+      // só aceita paths internos do admin — bloqueia open redirect (ex.: //evil.com, https://evil.com)
+      const next = raw && /^\/admin(\/|$)/.test(raw) ? raw : '/admin/pedidos';
       router.replace(next);
     } catch (err) {
       if (err instanceof ApiError && err.status === 401) {
