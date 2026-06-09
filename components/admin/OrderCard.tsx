@@ -58,7 +58,7 @@ export function OrderCard({ order, onTransition }: Props) {
       <ul className="mt-3 space-y-1 text-sm">
         {order.items.map((it) => (
           <li key={it.productId}>
-            {it.quantity}× {it.name}
+            {it.quantity}× {it.productName}
             {it.notes && <span className="text-neutral-500"> — {it.notes}</span>}
           </li>
         ))}

@@ -60,7 +60,7 @@ export type AdminOrder = {
   status: OrderStatus;
   customerName: string;
   customerPhone: string;
-  items: Array<{ productId: string; name: string; quantity: number; unitPrice: number; notes?: string }>;
+  items: Array<{ productId: string; productName: string; quantity: number; unitPrice: number; notes?: string }>;
   totals: { subtotal: number; discount: number; deliveryFee: number; total: number };
   createdAt: string;
 };

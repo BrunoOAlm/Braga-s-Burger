@@ -9,7 +9,7 @@ const baseOrder: AdminOrder = {
   status: 'RECEIVED',
   customerName: 'João',
   customerPhone: '(21) 90000-0000',
-  items: [{ productId: 'p1', name: 'Burger', quantity: 2, unitPrice: 25 }],
+  items: [{ productId: 'p1', productName: 'Burger', quantity: 2, unitPrice: 25 }],
   totals: { subtotal: 50, discount: 0, deliveryFee: 5, total: 55 },
   createdAt: '2026-06-07T14:30:00Z',
 };

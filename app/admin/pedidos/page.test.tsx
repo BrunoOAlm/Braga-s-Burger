@@ -18,7 +18,7 @@ const sample: adminApi.AdminOrder = {
   status: 'RECEIVED',
   customerName: 'João',
   customerPhone: '21000',
-  items: [{ productId: 'p1', name: 'X', quantity: 1, unitPrice: 10 }],
+  items: [{ productId: 'p1', productName: 'X', quantity: 1, unitPrice: 10 }],
   totals: { subtotal: 10, discount: 0, deliveryFee: 0, total: 10 },
   createdAt: '2026-06-07T00:00:00Z',
 };
