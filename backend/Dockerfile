@@ -3,10 +3,10 @@
 # ---- Build stage ----
 FROM gradle:8.10-jdk21-alpine AS build
 WORKDIR /app
-COPY --chown=gradle:gradle build.gradle.kts settings.gradle.kts ./
+COPY --chown=gradle:gradle build.gradle.kts settings.gradle.kts gradlew ./
 COPY --chown=gradle:gradle gradle ./gradle
 COPY --chown=gradle:gradle src ./src
-RUN gradle --no-daemon bootJar -x test
+RUN chmod +x ./gradlew && ./gradlew --no-daemon bootJar -x test
 
 # ---- Runtime stage ----
 FROM eclipse-temurin:21-jre-alpine
