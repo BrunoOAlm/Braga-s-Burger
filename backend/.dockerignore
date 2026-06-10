@@ -1,0 +1,9 @@
+build/
+.gradle/
+gradle-app.setting
+.idea/
+*.iml
+.vscode/
+src/test/
+README*.md
+*.log

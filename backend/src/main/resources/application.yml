@@ -31,7 +31,7 @@ spring:
       mail.smtp.starttls.enable: ${MAIL_TLS:false}
 
 server:
-  port: 8080
+  port: ${PORT:8080}
 
 management:
   endpoints:
@@ -59,8 +59,7 @@ app:
       fri: { open: "18:00", close: "00:00" }
       sat: { open: "18:00", close: "00:00" }
   cors:
-    allowedOrigins:
-      - "http://localhost:3000"
+    allowedOrigins: ${CORS_ALLOWED_ORIGINS:http://localhost:3000}
   auth:
     jwtSecret: ${JWT_SECRET}
     cookieSecure: ${COOKIE_SECURE:false}
