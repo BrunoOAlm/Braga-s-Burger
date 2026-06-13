@@ -11,8 +11,8 @@ export const fixtureCategories: Category[] = [
   { id: 'tabuas', name: 'Tábuas', order: 3, layout: 'grid' },
   { id: 'porcoes', name: 'Porções', order: 4, layout: 'grid' },
   { id: 'sobremesas', name: 'Sobremesas', order: 5, layout: 'grid' },
-  { id: 'molhos', name: 'Molhos', order: 6, layout: 'list' },
-  { id: 'bebidas', name: 'Bebidas', order: 7, layout: 'list' },
+  { id: 'molhos', name: 'Molhos', order: 6, layout: 'grid' },
+  { id: 'bebidas', name: 'Bebidas', order: 7, layout: 'grid' },
 ];
 
 export const fixtureProducts: Product[] = [
