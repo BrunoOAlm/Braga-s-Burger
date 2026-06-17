@@ -13,6 +13,12 @@
   --font-body: var(--font-inter);
 }
 
+/* A navbar é fixa no topo; sem isso a navegação por âncora (#cardapio, etc.)
+   para o título da seção parcialmente escondido atrás dela. */
+html {
+  scroll-padding-top: 6rem;
+}
+
 body {
   background-color: var(--color-ink);
   color: var(--color-paper);
