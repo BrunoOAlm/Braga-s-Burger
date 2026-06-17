@@ -19,7 +19,7 @@ export function CategoryFilter({ categories, active, onChange }: CategoryFilterP
   const buttonRefs = useRef<(HTMLButtonElement | null)[]>([]);
 
   const tabClass = (isActive: boolean) =>
-    `cursor-pointer rounded-full border px-4 py-2 text-sm font-semibold transition-colors duration-200 ${
+    `shrink-0 cursor-pointer rounded-full border px-4 py-2 text-sm font-semibold transition-colors duration-200 ${
       isActive
         ? 'border-paper bg-paper text-ink'
         : 'border-line bg-surface text-muted hover:text-paper'
@@ -46,7 +46,7 @@ export function CategoryFilter({ categories, active, onChange }: CategoryFilterP
     <div
       role="radiogroup"
       aria-label="Categorias do cardápio"
-      className="flex flex-wrap justify-center gap-3"
+      className="-mx-6 flex gap-3 overflow-x-auto px-6 pb-1 [-ms-overflow-style:none] [scrollbar-width:none] sm:mx-0 sm:flex-wrap sm:justify-center sm:overflow-visible sm:px-0 [&::-webkit-scrollbar]:hidden"
       onKeyDown={handleKeyDown}
     >
       {options.map((option, index) => {
