@@ -16,6 +16,13 @@ type ProductCardProps = {
   product: Product;
 };
 
+// next/image só aceita hosts configurados; uma imageUrl externa (ex.: editada
+// pelo admin) estouraria 500 na página inteira. Só tratamos como imagem válida
+// um caminho local servido por /public; o resto degrada para o placeholder.
+function isLocalImage(src: string | null | undefined): src is string {
+  return !!src && src.startsWith('/');
+}
+
 export function ProductCard({ product }: ProductCardProps) {
   const reduceMotion = useReducedMotion();
 
@@ -26,7 +33,7 @@ export function ProductCard({ product }: ProductCardProps) {
       className="flex h-full flex-col overflow-hidden rounded-2xl border border-line bg-surface"
     >
       <div className="relative aspect-[4/3] bg-ink">
-        {product.imageUrl ? (
+        {isLocalImage(product.imageUrl) ? (
           <Image
             src={product.imageUrl}
             alt={product.name}
