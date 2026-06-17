@@ -12,7 +12,7 @@ describe('Navbar', () => {
   it('exibe a logo e os links de navegação', () => {
     render(<Navbar />);
     expect(screen.getByAltText("Braga's Burger")).toBeInTheDocument();
-    expect(screen.getByRole('link', { name: 'Cardápio' })).toHaveAttribute('href', '#cardapio');
+    expect(screen.getByRole('link', { name: 'Cardápio' })).toHaveAttribute('href', '/#cardapio');
   });
 
   it('abre o menu mobile ao clicar no botão e mostra os links', async () => {

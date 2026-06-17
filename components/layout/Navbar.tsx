@@ -1,15 +1,19 @@
 'use client';
 
 import { useState } from 'react';
+import Link from 'next/link';
 import { Button } from '@/components/ui/Button';
 import { Logo } from '@/components/ui/Logo';
 import { HeaderUserMenu } from './HeaderUserMenu';
 
+// Âncoras absolutas (/#secao) para funcionarem também a partir das páginas
+// legais (/termos, /politica-de-privacidade): navegam para a home e rolam até
+// a seção. Na própria home, como só muda o fragmento, o scroll segue suave.
 const links = [
-  { label: 'Cardápio', href: '#cardapio' },
-  { label: 'Destaques', href: '#destaques' },
-  { label: 'Galeria', href: '#galeria' },
-  { label: 'Contato', href: '#contato' },
+  { label: 'Cardápio', href: '/#cardapio' },
+  { label: 'Destaques', href: '/#destaques' },
+  { label: 'Galeria', href: '/#galeria' },
+  { label: 'Contato', href: '/#contato' },
 ];
 
 export function Navbar() {
@@ -19,20 +23,20 @@ export function Navbar() {
   return (
     <nav className="fixed inset-x-4 top-4 z-50 mx-auto max-w-6xl">
       <div className="flex items-center justify-between rounded-full border border-line bg-ink/85 px-6 py-3 backdrop-blur">
-        <a href="#" aria-label="Braga's Burger — início" className="flex items-center">
+        <Link href="/" aria-label="Braga's Burger — início" className="flex items-center">
           <Logo size={40} priority />
-        </a>
+        </Link>
 
         {/* Links — desktop */}
         <ul className="hidden gap-6 md:flex">
           {links.map((link) => (
             <li key={link.href}>
-              <a
+              <Link
                 href={link.href}
                 className="text-sm font-medium text-muted transition-colors hover:text-paper"
               >
                 {link.label}
-              </a>
+              </Link>
             </li>
           ))}
         </ul>
@@ -40,7 +44,7 @@ export function Navbar() {
         {/* CTA + user menu — desktop */}
         <div className="hidden items-center gap-3 md:flex">
           <HeaderUserMenu />
-          <Button href="#cardapio">Peça agora</Button>
+          <Button href="/#cardapio">Peça agora</Button>
         </div>
 
         {/* Botão hambúrguer — mobile */}
@@ -83,23 +87,23 @@ export function Navbar() {
           <ul className="flex flex-col gap-1">
             {links.map((link) => (
               <li key={link.href}>
-                <a
+                <Link
                   href={link.href}
                   onClick={close}
                   className="block rounded-lg px-3 py-2 text-sm font-medium text-muted transition-colors hover:bg-surface hover:text-paper"
                 >
                   {link.label}
-                </a>
+                </Link>
               </li>
             ))}
           </ul>
-          <a
-            href="#cardapio"
+          <Link
+            href="/#cardapio"
             onClick={close}
             className="mt-3 block rounded-full bg-white px-6 py-3 text-center text-sm font-semibold text-ink transition-colors hover:bg-paper"
           >
             Peça agora
-          </a>
+          </Link>
           <div className="mt-3">
             <HeaderUserMenu />
           </div>

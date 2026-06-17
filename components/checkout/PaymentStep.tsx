@@ -1,6 +1,8 @@
 'use client';
 
+import type { ReactNode } from 'react';
 import type { PaymentMethod } from '@/lib/types';
+import { CardGlyph, CashGlyph, PixGlyph } from '@/components/ui/PaymentGlyphs';
 
 interface Props {
   payment: PaymentMethod | null;
@@ -11,11 +13,11 @@ interface Props {
   onBack: () => void;
 }
 
-const OPTIONS: Array<{ value: PaymentMethod; label: string }> = [
-  { value: 'pix', label: 'Pix' },
-  { value: 'credit', label: 'Cartão de crédito' },
-  { value: 'debit', label: 'Cartão de débito' },
-  { value: 'cash', label: 'Dinheiro' },
+const OPTIONS: Array<{ value: PaymentMethod; label: string; icon: ReactNode }> = [
+  { value: 'pix', label: 'Pix', icon: <PixGlyph /> },
+  { value: 'credit', label: 'Cartão de crédito', icon: <CardGlyph /> },
+  { value: 'debit', label: 'Cartão de débito', icon: <CardGlyph /> },
+  { value: 'cash', label: 'Dinheiro', icon: <CashGlyph /> },
 ];
 
 export function PaymentStep({
@@ -46,6 +48,7 @@ export function PaymentStep({
               checked={payment === o.value}
               onChange={() => onPaymentChange(o.value)}
             />
+            <span className="text-paper">{o.icon}</span>
             {o.label}
           </label>
         ))}

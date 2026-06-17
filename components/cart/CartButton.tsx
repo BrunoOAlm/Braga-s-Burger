@@ -1,5 +1,6 @@
 'use client';
 
+import { useEffect, useState } from 'react';
 import { useCartStore } from '@/lib/cart-store';
 
 interface Props {
@@ -11,6 +12,20 @@ export function CartButton({ onOpen }: Props) {
     s.items.reduce((sum, i) => sum + i.quantity, 0),
   );
 
+  // Some o FAB enquanto o rodapé está à vista: no canto inferior direito ele
+  // cobriria os links (Termos/Política), sobretudo em telas estreitas/mobile.
+  const [footerVisible, setFooterVisible] = useState(false);
+  useEffect(() => {
+    if (typeof IntersectionObserver === 'undefined') return;
+    const footer = document.querySelector('footer');
+    if (!footer) return;
+    const observer = new IntersectionObserver(
+      ([entry]) => setFooterVisible(entry.isIntersecting),
+    );
+    observer.observe(footer);
+    return () => observer.disconnect();
+  }, []);
+
   if (totalItems === 0) return null;
 
   return (
@@ -18,7 +33,10 @@ export function CartButton({ onOpen }: Props) {
       type="button"
       aria-label={`Abrir carrinho com ${totalItems} ${totalItems === 1 ? 'item' : 'itens'}`}
       onClick={onOpen}
-      className="fixed bottom-6 right-6 z-40 flex h-14 items-center gap-3 rounded-full bg-paper px-5 text-ink shadow-lg transition-colors hover:bg-white"
+      aria-hidden={footerVisible}
+      className={`fixed bottom-6 right-6 z-40 flex h-14 items-center gap-3 rounded-full bg-paper px-5 text-ink shadow-lg transition-all duration-300 hover:bg-white ${
+        footerVisible ? 'pointer-events-none translate-y-4 opacity-0' : ''
+      }`}
     >
       <svg
         width="22"
