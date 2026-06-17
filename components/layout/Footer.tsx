@@ -1,10 +1,12 @@
 import { Logo } from '@/components/ui/Logo';
 import { deliveryMethods, paymentMethods } from './footer-icons';
 
+// Âncoras absolutas (/#secao) para também funcionarem a partir das páginas
+// legais — navegam para a home e rolam até a seção.
 const navLinks = [
-  { label: 'Cardápio', href: '#cardapio' },
-  { label: 'Galeria', href: '#galeria' },
-  { label: 'Contato', href: '#contato' },
+  { label: 'Cardápio', href: '/#cardapio' },
+  { label: 'Galeria', href: '/#galeria' },
+  { label: 'Contato', href: '/#contato' },
 ];
 
 const legalLinks = [
