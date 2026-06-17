@@ -61,10 +61,19 @@ class MenuControllerIT {
             .andExpect(jsonPath("$.categories[?(@.id=='molhos')].layout").value("grid"))
             .andExpect(jsonPath(
                 "$.categories[?(@.id=='bebidas')].products[?(@.id=='coca-cola-lata')].imageUrl")
-                .value("/images/products/coca-cola-lata.webp"))
-            // sem foto ainda: image_url continua NULL (placeholder no front).
+                .value("/images/products/coca-cola-lata.webp"));
+    }
+
+    @Test
+    void get_menu_v8_tabua_vegano_e_coca_zero_com_foto() throws Exception {
+        // V8: as duas fotos que faltavam na V7 foram ligadas.
+        mvc.perform(get("/api/v1/menu"))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath(
+                "$.categories[?(@.id=='tabuas')].products[?(@.id=='tabua-vegano')].imageUrl")
+                .value("/images/products/tabua-vegano.webp"))
             .andExpect(jsonPath(
                 "$.categories[?(@.id=='bebidas')].products[?(@.id=='coca-cola-zero-600ml')].imageUrl")
-                .value(org.hamcrest.Matchers.contains((Object) null)));
+                .value("/images/products/coca-cola-zero-600ml.webp"));
     }
 }

@@ -43,6 +43,20 @@ describe('ProductCard', () => {
     expect(screen.getByTestId('product-placeholder')).toBeInTheDocument();
   });
 
+  it('usa object-cover para comida (preenche o frame)', () => {
+    render(<ProductCard product={{ ...base, categoryId: 'burgers' }} />);
+    expect(screen.getByAltText('Duplo')).toHaveClass('object-cover');
+  });
+
+  it('usa object-contain para bebidas/molhos (mostra a garrafa/lata inteira, sem decapitar)', () => {
+    render(
+      <ProductCard
+        product={{ ...base, categoryId: 'bebidas', imageUrl: '/images/products/heineken-330ml.webp' }}
+      />,
+    );
+    expect(screen.getByAltText('Duplo')).toHaveClass('object-contain');
+  });
+
   it('mostra "Esgotado" quando indisponível', () => {
     render(<ProductCard product={{ ...base, available: false }} />);
     expect(screen.getByText('Esgotado')).toBeInTheDocument();

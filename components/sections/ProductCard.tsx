@@ -23,6 +23,13 @@ function isLocalImage(src: string | null | undefined): src is string {
   return !!src && src.startsWith('/');
 }
 
+// Bebidas e molhos têm fotos em retrato (garrafa/lata centrada); object-cover
+// num frame quadrado corta a tampa e a base. Usamos object-contain (produto
+// inteiro) sobre um fundo desfocado da própria foto: o card preenche até a
+// borda, sem barras mortas e sem decapitar. Comida (burgers, tabuas, porções,
+// sobremesas) é quadrada e preenche o frame com object-cover.
+const containCategories = new Set(['bebidas', 'molhos']);
+
 export function ProductCard({ product }: ProductCardProps) {
   const reduceMotion = useReducedMotion();
 
@@ -32,15 +39,37 @@ export function ProductCard({ product }: ProductCardProps) {
       transition={{ duration: 0.2 }}
       className="flex h-full flex-col overflow-hidden rounded-2xl border border-line bg-surface"
     >
-      <div className="relative aspect-[4/3] bg-ink">
+      <div className="relative aspect-square overflow-hidden bg-ink">
         {isLocalImage(product.imageUrl) ? (
-          <Image
-            src={product.imageUrl}
-            alt={product.name}
-            fill
-            className="object-cover"
-            sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
-          />
+          containCategories.has(product.categoryId) ? (
+            <>
+              {/* Fundo: a própria foto em cover + blur, preenchendo a borda. */}
+              <Image
+                src={product.imageUrl}
+                alt=""
+                aria-hidden
+                fill
+                className="scale-110 object-cover opacity-60 blur-2xl"
+                sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+              />
+              {/* Frente: produto inteiro, sem corte. */}
+              <Image
+                src={product.imageUrl}
+                alt={product.name}
+                fill
+                className="object-contain"
+                sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+              />
+            </>
+          ) : (
+            <Image
+              src={product.imageUrl}
+              alt={product.name}
+              fill
+              className="object-cover"
+              sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+            />
+          )
         ) : (
           <div
             data-testid="product-placeholder"
