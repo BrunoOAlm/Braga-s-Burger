@@ -45,3 +45,6 @@ __pycache__/
 backend/build/
 backend/.gradle/
 backend/.env
+
+# Portfólio pessoal / marketing (não é código do produto; fica fora do repo público)
+docs/portfolio/
