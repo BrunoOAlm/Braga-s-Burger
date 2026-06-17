@@ -51,4 +51,20 @@ class MenuControllerIT {
             // burgers tem display_order=10 no seed (categoria #1).
             .andExpect(jsonPath("$.categories[0].displayOrder").value(10));
     }
+
+    @Test
+    void get_menu_bebidas_e_molhos_em_grid_com_fotos() throws Exception {
+        mvc.perform(get("/api/v1/menu"))
+            .andExpect(status().isOk())
+            // V7: bebidas e molhos viram cards (grid) com foto.
+            .andExpect(jsonPath("$.categories[?(@.id=='bebidas')].layout").value("grid"))
+            .andExpect(jsonPath("$.categories[?(@.id=='molhos')].layout").value("grid"))
+            .andExpect(jsonPath(
+                "$.categories[?(@.id=='bebidas')].products[?(@.id=='coca-cola-lata')].imageUrl")
+                .value("/images/products/coca-cola-lata.webp"))
+            // sem foto ainda: image_url continua NULL (placeholder no front).
+            .andExpect(jsonPath(
+                "$.categories[?(@.id=='bebidas')].products[?(@.id=='coca-cola-zero-600ml')].imageUrl")
+                .value(org.hamcrest.Matchers.contains((Object) null)));
+    }
 }
