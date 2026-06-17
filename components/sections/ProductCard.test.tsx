@@ -34,6 +34,29 @@ describe('ProductCard', () => {
     expect(screen.getByTestId('product-placeholder')).toBeInTheDocument();
   });
 
+  it('cai no placeholder quando imageUrl não é local (host externo não quebra a página)', () => {
+    // next/image só aceita hosts configurados; uma URL externa (ex.: edição
+    // de admin) estouraria 500 na página inteira. ProductCard só renderiza
+    // imagens locais (/images/...); o resto degrada para o placeholder.
+    render(<ProductCard product={{ ...base, imageUrl: 'https://encrypted-tbn3.gstatic.com/shopping?q=x' }} />);
+    expect(screen.queryByAltText('Duplo')).not.toBeInTheDocument();
+    expect(screen.getByTestId('product-placeholder')).toBeInTheDocument();
+  });
+
+  it('usa object-cover para comida (preenche o frame)', () => {
+    render(<ProductCard product={{ ...base, categoryId: 'burgers' }} />);
+    expect(screen.getByAltText('Duplo')).toHaveClass('object-cover');
+  });
+
+  it('usa object-contain para bebidas/molhos (mostra a garrafa/lata inteira, sem decapitar)', () => {
+    render(
+      <ProductCard
+        product={{ ...base, categoryId: 'bebidas', imageUrl: '/images/products/heineken-330ml.webp' }}
+      />,
+    );
+    expect(screen.getByAltText('Duplo')).toHaveClass('object-contain');
+  });
+
   it('mostra "Esgotado" quando indisponível', () => {
     render(<ProductCard product={{ ...base, available: false }} />);
     expect(screen.getByText('Esgotado')).toBeInTheDocument();

@@ -20,6 +20,10 @@ describe('MenuSection', () => {
     render(<MenuSection categories={categories} products={products} />);
     await userEvent.click(screen.getByRole('radio', { name: 'Bebidas' }));
     expect(screen.queryByRole('heading', { name: 'Burgers' })).not.toBeInTheDocument();
-    expect(screen.getByText('Coca-Cola Lata')).toBeInTheDocument();
+    // bebidas agora rendem como card (V7): o nome vira heading do ProductCard.
+    expect(screen.getByRole('heading', { name: 'Coca-Cola Lata' })).toBeInTheDocument();
+    expect(
+      screen.getByRole('button', { name: 'Adicionar Coca-Cola Lata ao carrinho' })
+    ).toBeInTheDocument();
   });
 });
