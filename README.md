@@ -1,6 +1,6 @@
 # Braga's Burger
 
-> Plataforma completa de pedidos online para uma hamburgueria artesanal da Zona Norte do Rio de Janeiro. Da landing page ao painel administrativo, do banco em produção ao deploy em multi-cloud — entregue como um trabalho real para um cliente real.
+> Plataforma completa de pedidos online desenvolvida como proposta e projeto de portfólio para uma hamburgueria artesanal da Zona Norte do Rio de Janeiro. Da landing page ao painel administrativo, do banco em produção ao deploy em multi-cloud.
 
 [![Next.js](https://img.shields.io/badge/Next.js-16-black?logo=next.js)](https://nextjs.org/)
 [![React](https://img.shields.io/badge/React-19-61dafb?logo=react)](https://react.dev/)
@@ -139,6 +139,6 @@ O deploy é totalmente reprodutível seguindo o plano em [`docs/superpowers/plan
 
 ## Autor
 
-**Bruno Oliveira de Almeida** — [GitHub](https://github.com/BrunoOAlm) · [LinkedIn](https://linkedin.com/in/brunoalm)
+Bruno Oliveira de Almeida — [GitHub](https://github.com/BrunoOAlm) · [LinkedIn](https://www.linkedin.com/in/brunooliveiradealmeida)
 
-Este projeto foi desenvolvido por mim como freelancer para a **Braga's Burger**, hamburgueria artesanal de Higienópolis (RJ). Conteúdo do negócio (cardápio, fotos, textos jurídicos) é responsabilidade do cliente.
+Projeto independente, desenvolvido por mim como proposta e peça de portfólio para a Braga's Burger, hamburgueria artesanal de Higienópolis (RJ). Não há vínculo oficial com o estabelecimento: marca, cardápio e fotos pertencem a ele e são usados aqui apenas para demonstração.
